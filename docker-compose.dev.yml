@@ -1,0 +1,51 @@
+name: kanban
+
+services:
+  kanban-postgres:
+    container_name: kanban-postgres
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - kanban-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready']
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  kanban-redis:
+    container_name: kanban-redis
+    image: redis:7-alpine
+    depends_on:
+      kanban-postgres:
+        condition: service_healthy
+    expose:
+      - 6379
+    ports:
+      - 6379:6379
+    volumes:
+      - kanban-redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  kanban-mailpit: # For sending email in development
+    container_name: kanban-mailpit
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - 1025:1025
+      - 8025:8025
+
+volumes:
+  kanban-postgres-data:
+  kanban-redis-data:

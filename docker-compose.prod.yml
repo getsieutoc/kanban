@@ -1,0 +1,80 @@
+name: Kanban
+
+services:
+  Kanban-nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - DOMAIN=${DOMAIN}
+        - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@Kanban-postgres:5432/postgres?schema=public
+        - REDIS_URL=redis://Kanban-redis:6379
+        - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+        - BETTER_AUTH_URL=${BETTER_AUTH_URL}
+        - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+        - POSTMARK_API_KEY=${POSTMARK_API_KEY}
+        - FROM_EMAIL=${FROM_EMAIL}
+        - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+        - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+        - R2_BUCKET_NAME=${R2_BUCKET_NAME}
+        - R2_ENDPOINT=${R2_ENDPOINT}
+    expose:
+      - 3000
+    networks:
+      - dokploy-network
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.Kanban.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.Kanban.entrypoints=web
+      - traefik.http.services.Kanban.loadbalancer.server.port=3000
+    depends_on:
+      Kanban-postgres:
+        condition: service_healthy
+      Kanban-redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  Kanban-postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    expose:
+      - 5432
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    volumes:
+      - Kanban-postgres-data:/var/lib/postgresql/data
+    networks:
+      - dokploy-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready']
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  Kanban-redis:
+    image: redis:7-alpine
+    expose:
+      - 6379
+    volumes:
+      - Kanban-redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      Kanban-postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  dokploy-network:
+    external: true
+
+volumes:
+  Kanban-postgres-data:
+  Kanban-redis-data:

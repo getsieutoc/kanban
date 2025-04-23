@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SystemRole {
+  ADMIN
+  MANAGER
+  USER
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+  ONLY_ME
+}
+
+enum MembershipRole {
+  OWNER
+  MEMBER
+}
+
+enum MembershipStatus {
+  PENDING
+  JOINED
+  ACTIVE
+  DISABLED
+}
+
+model User {
+  id            String       @id @default(cuid())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
+  name          String
+  email         String       @unique
+  emailVerified Boolean
+  image         String?
+  systemRole    SystemRole   @default(USER)
+  memberships   Membership[]
+  sessions      Session[]
+  accounts      Account[]
+  assignedCards Card[]
+  reactions     Reaction[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+}
+
+model Tenant {
+  id          String       @id @default(cuid())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @default(now()) @updatedAt
+  name        String
+  memberships Membership[]
+  boards      Board[]
+  labels      Label[]
+}
+
+model Membership {
+  id        String           @id @default(cuid())
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @default(now()) @updatedAt
+  tenantId  String
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  role      MembershipRole   @default(MEMBER)
+  status    MembershipStatus @default(PENDING)
+
+  @@unique([tenantId, userId])
+}
+
+model Board {
+  id          String     @id @default(cuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
+  title       String
+  description String?
+  tenant      Tenant     @relation(fields: [tenantId], references: [id])
+  tenantId    String
+  visibility  Visibility @default(PUBLIC)
+  lists       List[]
+
+  @@index([tenantId])
+  @@index([createdAt])
+}
+
+model List {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  title     String
+  order     Int
+  board     Board    @relation(fields: [boardId], references: [id])
+  boardId   String
+  cards     Card[]
+
+  @@index([boardId])
+}
+
+model Card {
+  id          String      @id @default(cuid())
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now()) @updatedAt
+  title       String
+  description String?
+  dueDate     DateTime?
+  list        List        @relation(fields: [listId], references: [id])
+  listId      String
+  order       Int
+  assignees   User[]
+  labels      CardLabel[]
+  reactions   Reaction[]
+
+  @@index([listId])
+}
+
+model Label {
+  id        String      @id @default(cuid())
+  createdAt DateTime    @default(now())
+  name      String
+  color     String
+  tenant    Tenant      @relation(fields: [tenantId], references: [id])
+  tenantId  String
+  cards     CardLabel[]
+
+  @@unique([tenantId, name])
+}
+
+model CardLabel {
+  id      String @id @default(cuid())
+  card    Card   @relation(fields: [cardId], references: [id])
+  cardId  String
+  label   Label  @relation(fields: [labelId], references: [id])
+  labelId String
+
+  @@unique([cardId, labelId])
+}
+
+model Reaction {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  type      String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  card      Card     @relation(fields: [cardId], references: [id])
+  cardId    String
+
+  @@unique([userId, cardId, type])
+  @@index([userId, cardId])
+}
