@@ -13,7 +13,7 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   title: 'Kanban',
-  description: 'Your Melody, Our Mission',
+  description: 'Your Tickets, Our Mission',
 };
 
 export default async function RootLayout({

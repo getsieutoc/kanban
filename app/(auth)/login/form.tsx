@@ -9,6 +9,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Separator } from '@/components/ui/separator';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +18,6 @@ import { useForm } from 'react-hook-form';
 import { useTransition } from 'react';
 import Link from 'next/link';
 import * as z from 'zod';
-import { Separator } from '@/components/ui/separator';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
@@ -45,22 +45,9 @@ export const LoginForm = () => {
     startTransition(async () => {
       await signIn.magicLink({
         email: inputs.email,
-        callbackURL: callbackUrl ?? '/dashboard',
+        callbackURL: callbackUrl ?? '/boards',
       });
     });
-  };
-
-  const signInGoogle = async () => {
-    const data = await signIn.social({
-      provider: 'google',
-    });
-
-    console.log(JSON.stringify(data));
-
-    if (data.error) {
-      console.error('Failed to sign in with Google:', data.error);
-      return;
-    }
   };
 
   return (
@@ -108,10 +95,6 @@ export const LoginForm = () => {
         </form>
 
         <Separator className="w-full" />
-
-        <Button className="w-full" variant="outline" onClick={signInGoogle}>
-          Sign In with Google
-        </Button>
 
         <p className="text-muted-foreground px-8 text-center text-xs">
           By clicking continue, you agree to our{' '}
