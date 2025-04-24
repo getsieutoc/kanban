@@ -43,7 +43,7 @@ export default async function BoardPage({
           </ListContainer>
         ))}
 
-        <AddNewList boardId={boardId} />
+        <AddNewList boardId={boardId} totalList={lists.length} />
       </div>
     </div>
   );

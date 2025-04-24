@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
+  Form,
   FormControl,
   FormDescription,
   FormField,
@@ -28,22 +29,23 @@ import { useAuth } from '@/hooks/use-auth';
 import { clearCache } from '@/lib/cache';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo, useState } from 'react';
-import { Form, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
 const listSchema = z.object({
   title: z.string().default(''),
-  description: z.string().default(''),
+  order: z.number().default(0),
 });
 
 type FormInputs = z.infer<typeof listSchema>;
 
 type AddNewListProps = {
   boardId: string;
+  totalList: number;
 };
 
-export const AddNewList = ({ boardId }: AddNewListProps) => {
+export const AddNewList = ({ boardId, totalList }: AddNewListProps) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -52,7 +54,7 @@ export const AddNewList = ({ boardId }: AddNewListProps) => {
   const defaultValues: FormInputs = useMemo(() => {
     return {
       title: '',
-      description: '',
+      order: totalList,
     };
   }, []);
 
@@ -85,7 +87,7 @@ export const AddNewList = ({ boardId }: AddNewListProps) => {
       const newBoard = await createList({
         data: {
           ...input,
-          order: 0,
+          order: totalList,
           board: { connect: { id: boardId } },
         },
       });
@@ -134,25 +136,6 @@ export const AddNewList = ({ boardId }: AddNewListProps) => {
                       <FormLabel>Title</FormLabel>
                       <FormControl>
                         <Input placeholder="Title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                      <FormDescription></FormDescription>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Description"
-                          rows={2}
-                          {...field}
-                        />
                       </FormControl>
                       <FormMessage />
                       <FormDescription></FormDescription>
