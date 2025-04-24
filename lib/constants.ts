@@ -25,30 +25,13 @@ type NavItem = {
 
 export const navItems: NavItem[] = [
   {
-    title: 'Dashboard',
-    url: '/dashboard/overview',
+    title: 'Boards',
+    url: '/boards',
     icon: 'dashboard',
     isActive: false,
     shortcut: ['d', 'd'],
     items: [], // Empty array as there are no child items for Dashboard
   },
-  {
-    title: 'Albums',
-    url: '/dashboard/albums',
-    icon: 'library',
-    shortcut: ['t', 't'],
-    isActive: false,
-    items: [], // No child items
-  },
-  {
-    title: 'Tracks',
-    url: '/dashboard/tracks',
-    icon: 'music',
-    shortcut: ['t', 't'],
-    isActive: false,
-    items: [], // No child items
-  },
-
   {
     title: 'Account',
     url: '#', // Placeholder as there is no direct link for the parent
@@ -58,14 +41,14 @@ export const navItems: NavItem[] = [
     items: [
       {
         title: 'Profile',
-        url: '/dashboard/profile',
+        url: '/profile',
         icon: 'userPen',
         shortcut: ['m', 'm'],
       },
       {
         title: 'Login',
         shortcut: ['l', 'l'],
-        url: '/',
+        url: '/login',
         icon: 'login',
       },
     ],

@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronRight, type LucideIcon } from 'lucide-react';
+import { WorkspaceSwitcher } from '@/components/common/workspace-switcher';
 
 import {
   Collapsible,
@@ -33,8 +34,10 @@ export function NavMain({
   }[];
 }) {
   return (
-    <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+    <>
+      <WorkspaceSwitcher />
+      <SidebarGroup>
+        <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
@@ -68,6 +71,7 @@ export function NavMain({
           </Collapsible>
         ))}
       </SidebarMenu>
-    </SidebarGroup>
+      </SidebarGroup>
+    </>
   );
 }

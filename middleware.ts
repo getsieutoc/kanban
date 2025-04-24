@@ -37,7 +37,7 @@ export const config = {
   // Specify the routes the middleware applies to
   matcher: [
     '/',               // Handle root path
-    '/boards/:path*',  // Protect board routes
+    // '/boards/:path*',  // Temporarily disabled for testing
     '/login',          // Handle auth pages
     '/signup',
     '/account/:path*', // Keep existing protected routes

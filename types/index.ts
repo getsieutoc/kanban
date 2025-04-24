@@ -33,31 +33,6 @@ export enum HttpMethod {
   TRACE = 'TRACE',
 }
 
-export type SelectedTrack = {
-  track: Track;
-  signedUrl?: string;
-};
-
-export type SelectedAlbum = {
-  album: Album;
-  // signedUrl?: string;
-};
-
-export type SelectedPlaylist = {
-  playlist: Playlist;
-  // signedUrl?: string;
-};
-
-export type UploadedFile = {
-  name: string;
-  size: number;
-};
-
 export type UserWithPayload = Prisma.UserGetPayload<{
   include: typeof userIncludes;
 }>;
-
-export type UploadProgress = {
-  progress: number;
-  status: 'uploading' | 'complete';
-};
