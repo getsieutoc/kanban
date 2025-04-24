@@ -6,27 +6,33 @@ import { useDraggable } from '@dnd-kit/react';
 
 type CardItemProps = {
   id: string;
-  columnId?: string;
+  columnId: string;
   index?: number;
   card: Card;
 };
 
 export function CardItem({
   id,
-  // columnId,
-  // index,
+  columnId,
+  index,
   card,
 }: CardItemProps) {
-  const { ref } = useDraggable({
+  const { ref, isDragging } = useDraggable({
     id,
-    // index,
-    // group: columnId,
-    // type: 'item',
-    // accept: ['item'],
+    data: {
+      type: 'card',
+      columnId,
+      index,
+    },
   });
 
   return (
-    <CardContent ref={ref} className="cursor-pointer rounded-md p-2 shadow-sm">
+    <CardContent 
+      ref={ref} 
+      className={`cursor-pointer rounded-md p-2 shadow-sm ${
+        isDragging ? 'opacity-50' : ''
+      }`}
+    >
       <div className="flex flex-col gap-2">
         <div className="text-sm">{card.title}</div>
 

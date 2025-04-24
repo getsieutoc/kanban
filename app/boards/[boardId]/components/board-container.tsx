@@ -12,13 +12,63 @@ type BoardContainerProps = {
 };
 
 export const BoardContainer = ({ lists }: BoardContainerProps) => {
+  console.log('---------------------- re-render');
   const [items, setItems] = useState(lists);
+
+  const handleDragEvent = (event: any) => {
+    if (!event.operation?.over) return;
+
+    const active = event.operation.draggable;
+    const over = event.operation.over;
+    const activeId = active.id;
+    const overId = over.id;
+
+    // Find the source and target lists
+    const activeList = items.find(
+      (list) =>
+        list.cards.some((card) => card.id === activeId) || list.id === activeId
+    );
+    const overList = items.find((list) => list.id === overId);
+
+    if (!activeList || !overList) return;
+
+    // Update the lists state
+    setItems((currentItems) => {
+      const newItems = [...currentItems];
+
+      // If dragging a card
+      if (activeList.cards.some((card) => card.id === activeId)) {
+        const card = activeList.cards.find((c) => c.id === activeId)!;
+
+        // Remove card from source list
+        const sourceListIndex = newItems.findIndex(
+          (l) => l.id === activeList.id
+        );
+        newItems[sourceListIndex].cards = newItems[
+          sourceListIndex
+        ].cards.filter((c) => c.id !== activeId);
+
+        // Add card to target list
+        const targetListIndex = newItems.findIndex((l) => l.id === overList.id);
+        newItems[targetListIndex].cards.push({
+          ...card,
+          listId: overList.id,
+        });
+      }
+
+      return newItems;
+    });
+  };
 
   return (
     <DragDropProvider
       onDragOver={(event) => {
-        console.log('### event: ', event);
-        setItems((items) => move(items, event));
+        console.log('### dragOver event: ', event);
+        handleDragEvent(event);
+      }}
+      onDragEnd={(event) => {
+        console.log('### dragEnd event: ', event);
+        handleDragEvent(event);
       }}
     >
       {items.map((l) => (

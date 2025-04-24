@@ -3,7 +3,6 @@
 import { Card } from '@/components/ui/card';
 import { List } from '@prisma/client';
 import { useDroppable } from '@dnd-kit/react';
-import { CollisionPriority } from '@dnd-kit/abstract';
 
 type ListContainerProps = {
   id: string;
@@ -12,11 +11,12 @@ type ListContainerProps = {
 };
 
 export function ListContainer({ id, list, children }: ListContainerProps) {
-  const { ref } = useDroppable({
+  const { ref, isDropTarget: isOver } = useDroppable({
     id,
-    // type: 'column',
-    // accept: ['item'],
-    // collisionPriority: CollisionPriority.Low,
+    data: {
+      type: 'list',
+      accepts: ['card'],
+    },
   });
 
   return (
@@ -25,7 +25,12 @@ export function ListContainer({ id, list, children }: ListContainerProps) {
         <h3 className="text-sm font-medium">{list.title}</h3>
       </div>
 
-      <div ref={ref} className="flex flex-col gap-2">
+      <div 
+        ref={ref} 
+        className={`flex flex-col gap-2 min-h-[50px] ${
+          isOver ? 'bg-muted/50' : ''
+        }`}
+      >
         {children}
       </div>
     </Card>
