@@ -1,3 +1,4 @@
+import { userIncludes } from '@/lib/rich-includes';
 import { prisma } from '@/lib/prisma-client';
 import { NextResponse } from 'next/server';
 import { getAuth } from '@/auth';
@@ -15,25 +16,14 @@ export async function GET() {
       where: { id: session.userId },
     });
 
-    if (!user || !user.activeTenantId) {
+    if (!user) {
       return NextResponse.json(null, { status: 201 });
     }
 
     // Then get the user data with their active tenant and boards
     const userData = await prisma.user.findUniqueOrThrow({
       where: { id: session.userId },
-      include: {
-        memberships: {
-          where: { tenantId: user.activeTenantId },
-          include: {
-            tenant: {
-              include: {
-                boards: true
-              }
-            }
-          }
-        }
-      }
+      include: userIncludes,
     });
 
     return NextResponse.json(userData, { status: 200 });

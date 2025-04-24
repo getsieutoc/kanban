@@ -3,7 +3,11 @@
 import { MembershipRole, MembershipStatus, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma-client';
 
-export const findTenant = async (id?: string | null) => {
+export const getTenants = async (input?: Prisma.TenantFindManyArgs) => {
+  return await prisma.tenant.findMany(input);
+};
+
+export const getTenantById = async (id?: string | null) => {
   if (!id) return null;
 
   const workspace = await prisma.tenant.findUnique({

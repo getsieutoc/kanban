@@ -1,11 +1,9 @@
-'use server';
-
-import { findTenant } from '@/actions/tenants';
+import { getTenantById } from '@/actions/tenants';
 import { getAuth } from '@/auth';
 
 export const TenantInfo = async () => {
   const { user } = await getAuth();
-  const tenant = await findTenant(user?.activeTenantId);
+  const tenant = await getTenantById(user?.activeTenantId);
 
   return (
     <div className="flex flex-col items-center gap-0">
