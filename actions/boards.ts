@@ -16,6 +16,12 @@ export const getBoardsFromTenant = async (tenantId: string) => {
   });
 };
 
+export const getBoard = async (id: string) => {
+  return await prisma.board.findUnique({
+    where: { id },
+  });
+};
+
 export const createBoard = async (input: Prisma.BoardCreateInput) => {
   const board = await prisma.board.create({
     data: input,

@@ -20,6 +20,7 @@
   "dependencies": {
     "@better-auth/expo": "^1.2.3",
     "@better-fetch/fetch": "^1.1.15",
+    "@dnd-kit/react": "0.1.2",
     "@hookform/resolvers": "^4.1.2",
     "@prisma/client": "^6.5.0",
     "@radix-ui/react-accordion": "^1.2.3",
@@ -96,9 +97,9 @@
     "@trigger.dev/build": "^3.3.17",
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.17",
-    "@types/redis": "^4.0.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/redis": "^4.0.11",
     "concurrently": "^9.1.2",
     "eslint": "^9",
     "eslint-config-next": "15.2.0-canary.76",
