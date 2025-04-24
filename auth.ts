@@ -1,7 +1,9 @@
 import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { createAuthMiddleware } from 'better-auth/api';
 import { nextCookies } from 'better-auth/next-js';
 import { magicLink } from 'better-auth/plugins';
 import { betterAuth } from 'better-auth';
+import { isAuthPath } from '@/lib/utils';
 import { sendEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma-client';
 import { headers } from 'next/headers';
@@ -15,13 +17,50 @@ export const auth = betterAuth({
     requireEmailVerification: true,
   },
   emailVerification: {
-    sendVerificationEmail: async ({ user, url, token }, request) => {
+    sendVerificationEmail: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
         subject: 'Verify Kanban Account',
         content: `<a href="${url}">Click here to verify your account</a>`,
       });
     },
+  },
+  user: {
+    additionalFields: {
+      activeTenantId: {
+        type: 'string',
+        required: false,
+        defaultValue: null,
+        input: false,
+        fieldName: 'activeTenantId',
+      },
+    },
+  },
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      // DEBUG:
+      // console.log({ path: ctx.path, newSession: ctx.context.newSession });
+      // Only execute this at early stage of registration
+      if (isAuthPath(ctx.path) && ctx.context.newSession) {
+        const { user } = ctx.context.newSession;
+        console.log('### user: ', user);
+
+        if (user && !user.activeTenantId) {
+          const newTenant = await prisma.tenant.create({
+            data: {
+              name: 'Default Workspace',
+            },
+          });
+
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              activeTenantId: newTenant.id,
+            },
+          });
+        }
+      }
+    }),
   },
   plugins: [
     magicLink({

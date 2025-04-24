@@ -1,17 +1,19 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { Board } from '@/types';
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { 
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
+import { TenantInfo } from './tenant-info';
 
 interface BoardListProps {
   workspace: {
@@ -25,15 +27,24 @@ interface BoardListProps {
   remainingBoardsCount?: number;
 }
 
-export function BoardList({ workspace, boards, remainingBoardsCount = 0 }: BoardListProps) {
+export function BoardList({
+  workspace,
+  boards,
+  remainingBoardsCount = 0,
+}: BoardListProps) {
+  const { user } = useAuth();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('Most recently active');
   const [filterBy, setFilterBy] = useState('');
-  
+
   // Filter boards based on search query
-  const filteredBoards = boards.filter(board => 
-    board.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (board.description?.toLowerCase() || '').includes(searchQuery.toLowerCase())
+  const filteredBoards = boards.filter(
+    (board) =>
+      board.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (board.description?.toLowerCase() || '').includes(
+        searchQuery.toLowerCase()
+      )
   );
 
   // Sort boards based on selected option
@@ -53,45 +64,30 @@ export function BoardList({ workspace, boards, remainingBoardsCount = 0 }: Board
     <div className="flex flex-col space-y-6">
       {/* Workspace header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-emerald-500 text-xl font-semibold text-white">
-            {workspace.name.charAt(0).toUpperCase()}
-          </div>
-          
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-semibold">{workspace.name}</h2>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{workspace.isPrivate ? 'Private' : 'Public'}</span>
-              {workspace.url && (
-                <>
-                  <span>•</span>
-                  <span>{workspace.url}</span>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-        
-        <Button variant="default" size="sm" className="bg-blue-500 hover:bg-blue-600">
+        <TenantInfo />
+
+        <Button
+          variant="default"
+          size="sm"
+          className="bg-blue-500 hover:bg-blue-600"
+        >
           Invite Workspace members
         </Button>
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-border" />
-      
+      <div className="bg-border h-px" />
+
       {/* Boards section */}
       <div>
         <h3 className="mb-4 text-xl font-semibold">Boards</h3>
-        
+
         {/* Control row */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {/* Sort dropdown */}
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-muted-foreground">Sort by</span>
+              <span className="text-muted-foreground text-xs">Sort by</span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
@@ -99,7 +95,9 @@ export function BoardList({ workspace, boards, remainingBoardsCount = 0 }: Board
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onClick={() => setSortBy('Most recently active')}>
+                  <DropdownMenuItem
+                    onClick={() => setSortBy('Most recently active')}
+                  >
                     Most recently active
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setSortBy('Title A-Z')}>
@@ -111,14 +109,15 @@ export function BoardList({ workspace, boards, remainingBoardsCount = 0 }: Board
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            
+
             {/* Filter dropdown */}
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-muted-foreground">Filter by</span>
+              <span className="text-muted-foreground text-xs">Filter by</span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
-                    {filterBy || 'Choose a collection'} <span className="ml-2">▼</span>
+                    {filterBy || 'Choose a collection'}{' '}
+                    <span className="ml-2">▼</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -135,10 +134,10 @@ export function BoardList({ workspace, boards, remainingBoardsCount = 0 }: Board
               </DropdownMenu>
             </div>
           </div>
-          
+
           {/* Search */}
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-muted-foreground">Search</span>
+            <span className="text-muted-foreground text-xs">Search</span>
             <div className="relative">
               <Input
                 className="w-64 pr-8"
@@ -146,7 +145,10 @@ export function BoardList({ workspace, boards, remainingBoardsCount = 0 }: Board
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Escape' || (e.key === 'Backspace' && searchQuery === '')) {
+                  if (
+                    e.key === 'Escape' ||
+                    (e.key === 'Backspace' && searchQuery === '')
+                  ) {
                     setSearchQuery('');
                   }
                 }}
@@ -154,7 +156,7 @@ export function BoardList({ workspace, boards, remainingBoardsCount = 0 }: Board
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
                 >
                   ✕
                 </button>
@@ -162,30 +164,36 @@ export function BoardList({ workspace, boards, remainingBoardsCount = 0 }: Board
             </div>
           </div>
         </div>
-        
+
         {/* Boards grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {/* Create new board card */}
           <Card className="flex h-32 cursor-pointer flex-col items-center justify-center gap-1 border border-dashed border-gray-300 bg-gray-800/30 p-4 hover:bg-gray-700/30">
             <div className="text-center">
               <p className="font-medium">Create new board</p>
-              <p className="text-sm text-muted-foreground">{remainingBoardsCount} remaining</p>
+              <p className="text-muted-foreground text-sm">
+                {remainingBoardsCount} remaining
+              </p>
             </div>
           </Card>
-          
+
           {/* Existing boards */}
           {sortedBoards.map((board) => (
             <Card
               key={board.id}
               className={cn(
-                "flex h-32 cursor-pointer flex-col justify-between p-4 hover:opacity-90",
+                'flex h-32 cursor-pointer flex-col justify-between p-4 hover:opacity-90',
                 getColorForBoard(board)
               )}
             >
               <div>
-                <h3 className="font-semibold uppercase text-white">{board.title}</h3>
+                <h3 className="font-semibold text-white uppercase">
+                  {board.title}
+                </h3>
                 {board.description && (
-                  <p className="mt-1 text-sm text-white/80">{board.description}</p>
+                  <p className="mt-1 text-sm text-white/80">
+                    {board.description}
+                  </p>
                 )}
               </div>
               <div className="self-end">
@@ -203,11 +211,11 @@ export function BoardList({ workspace, boards, remainingBoardsCount = 0 }: Board
 
 function getColorForBoard(board: Board): string {
   const colorsMap: Record<string, string> = {
-    'DEVELOPMENT': 'bg-slate-400',
-    'INNOVATION': 'bg-cyan-600',
-    'MARKETING': 'bg-amber-600',
-    'GROWING': 'bg-purple-600',
+    DEVELOPMENT: 'bg-slate-400',
+    INNOVATION: 'bg-cyan-600',
+    MARKETING: 'bg-amber-600',
+    GROWING: 'bg-purple-600',
   };
-  
+
   return colorsMap[board.title] || 'bg-gray-600';
 }

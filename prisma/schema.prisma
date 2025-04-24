@@ -32,19 +32,20 @@ enum MembershipStatus {
 }
 
 model User {
-  id            String       @id @default(cuid())
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @default(now()) @updatedAt
-  name          String
-  email         String       @unique
-  emailVerified Boolean
-  image         String?
-  systemRole    SystemRole   @default(USER)
-  memberships   Membership[]
-  sessions      Session[]
-  accounts      Account[]
-  assignedCards Card[]
-  reactions     Reaction[]
+  id             String       @id @default(cuid())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
+  name           String
+  email          String       @unique
+  emailVerified  Boolean
+  image          String?
+  systemRole     SystemRole   @default(USER)
+  activeTenantId String?
+  memberships    Membership[]
+  sessions       Session[]
+  accounts       Account[]
+  assignedCards  Card[]
+  reactions      Reaction[]
 }
 
 model Session {
