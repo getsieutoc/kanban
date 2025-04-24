@@ -17,7 +17,7 @@ export function CardItem({
   index,
   card,
 }: CardItemProps) {
-  const { ref, isDragging } = useDraggable({
+  const { ref, isDragging, draggable } = useDraggable({
     id,
     data: {
       type: 'card',
@@ -27,10 +27,11 @@ export function CardItem({
   });
 
   return (
-    <CardContent 
-      ref={ref} 
-      className={`cursor-pointer rounded-md p-2 shadow-sm ${
-        isDragging ? 'opacity-50' : ''
+    <CardContent
+      ref={ref}
+      {...draggable}
+      className={`bg-accent cursor-pointer rounded-md p-2 shadow-sm ${
+        isDragging ? 'rotate-3' : ''
       }`}
     >
       <div className="flex flex-col gap-2">

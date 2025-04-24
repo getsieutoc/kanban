@@ -2,7 +2,6 @@
 
 import { ListWithPayload } from '@/types';
 import { DragDropProvider } from '@dnd-kit/react';
-import { move } from '@dnd-kit/helpers';
 import { useState } from 'react';
 import { ListContainer } from './list-container';
 import { CardItem } from './card-item';
@@ -15,13 +14,11 @@ export const BoardContainer = ({ lists }: BoardContainerProps) => {
   console.log('---------------------- re-render');
   const [items, setItems] = useState(lists);
 
-  const handleDragEvent = (event: any) => {
+  const handleDragEnd = (event: any) => {
     if (!event.operation?.over) return;
 
-    const active = event.operation.draggable;
-    const over = event.operation.over;
-    const activeId = active.id;
-    const overId = over.id;
+    const activeId = event.operation.draggable.id;
+    const overId = event.operation.over.id;
 
     // Find the source and target lists
     const activeList = items.find(
@@ -62,13 +59,13 @@ export const BoardContainer = ({ lists }: BoardContainerProps) => {
 
   return (
     <DragDropProvider
-      onDragOver={(event) => {
-        console.log('### dragOver event: ', event);
-        handleDragEvent(event);
-      }}
       onDragEnd={(event) => {
-        console.log('### dragEnd event: ', event);
-        handleDragEvent(event);
+        console.log('### event: ', event);
+        const { source } = event.operation;
+        console.log('### source type: ', source?.type);
+
+        // const activeId = event.operation.draggable.id;
+        // const overId = event.operation.over.id;
       }}
     >
       {items.map((l) => (

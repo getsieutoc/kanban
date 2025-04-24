@@ -11,11 +11,10 @@ type ListContainerProps = {
 };
 
 export function ListContainer({ id, list, children }: ListContainerProps) {
-  const { ref, isDropTarget: isOver } = useDroppable({
+  const { ref, isDropTarget, droppable } = useDroppable({
     id,
     data: {
       type: 'list',
-      accepts: ['card'],
     },
   });
 
@@ -26,9 +25,10 @@ export function ListContainer({ id, list, children }: ListContainerProps) {
       </div>
 
       <div 
-        ref={ref} 
+        ref={ref}
+        {...droppable}
         className={`flex flex-col gap-2 min-h-[50px] ${
-          isOver ? 'bg-muted/50' : ''
+          isDropTarget ? 'bg-muted/50' : ''
         }`}
       >
         {children}

@@ -34,28 +34,7 @@ export enum HttpMethod {
   TRACE = 'TRACE',
 }
 
-export type ListWithPayload = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  title: string;
-  order: number;
-  boardId: string;
-  cards: {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    title: string;
-    description: string | null;
-    order: number;
-    dueDate: Date | null;
-    listId: string;
-    assignees: any[];
-    labels: {
-      label: any;
-    }[];
-  }[];
-};
+export type ListWithPayload = Awaited<ReturnType<typeof getListsFromBoard>>[0];
 
 export type UserWithPayload = Prisma.UserGetPayload<{
   include: typeof userIncludes;
