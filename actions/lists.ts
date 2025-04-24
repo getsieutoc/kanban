@@ -11,21 +11,21 @@ export const getListsFromBoard = async (boardId: string) => {
     include: {
       cards: {
         orderBy: {
-          order: 'asc'
+          order: 'asc',
         },
         include: {
           assignees: true,
           labels: {
             include: {
-              label: true
-            }
-          }
-        }
-      }
+              label: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
-      order: 'asc'
-    }
+      order: 'asc',
+    },
   });
 };
 

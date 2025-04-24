@@ -3,6 +3,7 @@ import { type SearchParams } from 'nuqs';
 import { type ReactNode } from 'react';
 
 import { userIncludes } from '@/lib/rich-includes';
+import { getListsFromBoard } from '@/actions/lists';
 
 export * from '@prisma/client';
 
@@ -33,6 +34,9 @@ export enum HttpMethod {
   TRACE = 'TRACE',
 }
 
+export type ListWithPayload = Awaited<ReturnType<typeof getListsFromBoard>>[0];
+
 export type UserWithPayload = Prisma.UserGetPayload<{
   include: typeof userIncludes;
 }>;
+

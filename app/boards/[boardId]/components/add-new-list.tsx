@@ -108,7 +108,7 @@ export const AddNewList = ({ boardId, totalList }: AddNewListProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Card className="flex h-full w-[272px] shrink-0 cursor-pointer items-center justify-center p-2">
+        <Card className="flex w-64 shrink-0 cursor-pointer items-center justify-center p-2">
           <div className="text-muted-foreground flex items-center gap-1 text-sm">
             <Plus className="h-4 w-4" />
             <span>Add another list</span>
