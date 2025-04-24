@@ -38,8 +38,8 @@ export const Header = () => {
           href: '/statistics',
         },
         {
-          title: 'Dashboards',
-          href: '/dashboards',
+          title: 'boardss',
+          href: '/boardss',
         },
         {
           title: 'Recordings',

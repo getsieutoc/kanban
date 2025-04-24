@@ -64,8 +64,8 @@ export function UserProfile() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/dashboard">
-            Dashboard
+          <Link href="/boards">
+            boards
             <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
           </Link>
         </DropdownMenuItem>

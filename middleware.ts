@@ -38,11 +38,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/',               // Handle root path
-    '/boards/:path*',  // Re-enable boards protection
-    '/login',          // Handle auth pages
+    '/', // Handle root path
+    '/boards/:path*', // Re-enable boards protection
+    '/login', // Handle auth pages
     '/signup',
     '/account/:path*', // Protected routes
-    '/dashboard/:path*'
+    '/boards/:path*',
   ],
 };

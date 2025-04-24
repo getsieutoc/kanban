@@ -31,7 +31,7 @@ export const DashboardSidebar = () => {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <CollapsibleLogo base="/dashboard" />
+        <CollapsibleLogo base="/boards" />
       </SidebarHeader>
       <SidebarContent className="overflow-x-hidden">
         <SidebarGroup>

@@ -101,3 +101,5 @@ export const getAuth = async () => {
     ...data,
   };
 };
+
+export type Session = typeof auth.$Infer.Session;
