@@ -1,71 +1,37 @@
-"use client";
+'use client';
 
-import { BoardList } from "./components/board-list";
-import { useRouter } from "next/navigation";
-import { Visibility } from "@/types";
-
-// Mock data for demonstration
-const mockWorkspace = {
-  id: "1",
-  name: "Ants",
-  isPrivate: true,
-};
-
-const mockBoards = [
-  {
-    id: "1",
-    title: "DEVELOPMENT",
-    description: null,
-    visibility: Visibility.PUBLIC,
-    tenantId: "1",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: "2",
-    title: "INNOVATION",
-    description: null,
-    visibility: Visibility.PUBLIC,
-    tenantId: "1",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: "3",
-    title: "MARKETING",
-    description: null,
-    visibility: Visibility.PUBLIC,
-    tenantId: "1",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: "4",
-    title: "GROWING",
-    description: null,
-    visibility: Visibility.PUBLIC,
-    tenantId: "1",
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-];
+import { BoardList } from './components/board-list';
+import { useAuth } from '@/hooks/use-auth';
+import { Spinner } from '@/components/common/spinner';
 
 export default function BoardsPage() {
-  const router = useRouter();
+  const { userData, isLoading } = useAuth();
 
-  // Temporarily disable auth redirect for testing
-  /*
-  useEffect(() => {
-    router.push('/login');
-  }, [router]);
-  */
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  const activeMembership = userData?.memberships?.[0];
+  const activeTenant = activeMembership?.tenant;
+
+  if (!activeTenant) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>No active workspace found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto py-6">
-    
-      <BoardList 
-        workspace={mockWorkspace}
-        boards={mockBoards}
-        remainingBoardsCount={6}
+      <BoardList
+        workspace={activeTenant}
+        boards={activeTenant.boards || []}
+        remainingBoardsCount={0}
       />
     </div>
   );

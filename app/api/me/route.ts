@@ -10,20 +10,33 @@ export async function GET() {
       return NextResponse.json(null, { status: 201 });
     }
 
-    // TODO: Should we add activeProfileId into session so we can avoid this query?
-    const foundUser = await prisma.user.findUniqueOrThrow({
+    // First get the user to check their active tenant
+    const user = await prisma.user.findUniqueOrThrow({
       where: { id: session.userId },
     });
 
-    if (!foundUser || !foundUser.activeProfileId) {
+    if (!user || !user.activeTenantId) {
       return NextResponse.json(null, { status: 201 });
     }
 
-    const foundProfile = await prisma.profile.findUnique({
-      where: { id: foundUser.activeProfileId },
+    // Then get the user data with their active tenant and boards
+    const userData = await prisma.user.findUniqueOrThrow({
+      where: { id: session.userId },
+      include: {
+        memberships: {
+          where: { tenantId: user.activeTenantId },
+          include: {
+            tenant: {
+              include: {
+                boards: true
+              }
+            }
+          }
+        }
+      }
     });
 
-    return NextResponse.json(foundProfile, { status: 200 });
+    return NextResponse.json(userData, { status: 200 });
   } catch (_err) {
     return NextResponse.json(
       { success: false, message: 'Can not get my profile data' },

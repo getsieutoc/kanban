@@ -24,6 +24,21 @@ export const userIncludes = {
       id: true,
       tenantId: true,
       status: true,
+      tenant: {
+        select: {
+          id: true,
+          name: true,
+          boards: {
+            select: {
+              id: true,
+              title: true,
+              visibility: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
+        },
+      },
     },
   },
 };

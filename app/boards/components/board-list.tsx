@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
-import { TenantInfo } from './tenant-info';
 
 interface BoardListProps {
   workspace: {
@@ -64,8 +63,6 @@ export function BoardList({
     <div className="flex flex-col space-y-6">
       {/* Workspace header */}
       <div className="flex items-center justify-between">
-        <TenantInfo />
-
         <Button
           variant="default"
           size="sm"

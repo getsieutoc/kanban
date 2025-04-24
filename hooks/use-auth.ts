@@ -3,16 +3,17 @@ import { UserWithPayload } from '@/types';
 import useSWR from 'swr';
 
 export const useAuth = () => {
-  const { data, isPending, ...rest } = useSession();
-
-  const { data: profile, isLoading } = useSWR<UserWithPayload>('/api/me');
+  const { data: sessionData, isPending: isSessionPending, ...rest } = useSession();
+  const { data: userData, isLoading: isUserLoading } = useSWR<UserWithPayload>(
+    sessionData?.session ? '/api/me' : null
+  );
 
   return {
-    session: data?.session,
-    user: data?.user,
-    isLoading: isPending || isLoading,
-    isPending,
-    profile,
+    session: sessionData?.session,
+    user: sessionData?.user,
+    userData,
+    isLoading: isSessionPending || isUserLoading,
+    isPending: isSessionPending,
     ...rest,
   };
 };

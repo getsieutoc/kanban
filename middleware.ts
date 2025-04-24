@@ -3,9 +3,12 @@ import { getSessionCookie } from 'better-auth/cookies';
 
 export async function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
-  console.log('Session Cookie:', sessionCookie);
-
   const { pathname } = request.nextUrl;
+  
+  console.log('=== Auth Debug ===');
+  console.log('Path:', pathname);
+  console.log('Session Cookie Present:', !!sessionCookie);
+  console.log('Current URL:', request.url);
   
   // Handle root path
   if (pathname === '/') {
@@ -34,13 +37,12 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Specify the routes the middleware applies to
   matcher: [
     '/',               // Handle root path
-    // '/boards/:path*',  // Temporarily disabled for testing
+    '/boards/:path*',  // Re-enable boards protection
     '/login',          // Handle auth pages
     '/signup',
-    '/account/:path*', // Keep existing protected routes
+    '/account/:path*', // Protected routes
     '/dashboard/:path*'
   ],
 };

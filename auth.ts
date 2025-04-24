@@ -7,6 +7,7 @@ import { isAuthPath } from '@/lib/utils';
 import { sendEmail } from '@/lib/email';
 import { prisma } from '@/lib/prisma-client';
 import { headers } from 'next/headers';
+import { createTenant } from './actions/tenants';
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -43,14 +44,12 @@ export const auth = betterAuth({
       // Only execute this at early stage of registration
       if (isAuthPath(ctx.path) && ctx.context.newSession) {
         const { user } = ctx.context.newSession;
-        console.log('### user: ', user);
 
         if (user && !user.activeTenantId) {
-          const newTenant = await prisma.tenant.create({
-            data: {
-              name: 'Default Workspace',
-            },
-          });
+          const newTenant = await createTenant(
+            { name: 'Default Workspace' },
+            user
+          );
 
           await prisma.user.update({
             where: { id: user.id },
@@ -88,9 +87,6 @@ export const auth = betterAuth({
 export const getAuth = async () => {
   const data = await auth.api.getSession({
     headers: await headers(),
-    query: {
-      disableCookieCache: true,
-    },
   });
 
   if (!data) {
