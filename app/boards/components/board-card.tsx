@@ -1,3 +1,5 @@
+import NextLink from 'next/link';
+
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Board } from '@/types';
@@ -19,24 +21,26 @@ type BoardCardProps = {
 
 export const BoardCard = ({ board }: BoardCardProps) => {
   return (
-    <Card
-      key={board.id}
-      className={cn(
-        'flex h-32 cursor-pointer flex-col justify-between p-4 hover:opacity-90',
-        getColorForBoard(board)
-      )}
-    >
-      <div>
-        <h3 className="font-semibold text-white uppercase">{board.title}</h3>
-        {board.description && (
-          <p className="mt-1 text-sm text-white/80">{board.description}</p>
+    <NextLink href={`/boards/${board.id}`}>
+      <Card
+        key={board.id}
+        className={cn(
+          'flex h-32 cursor-pointer flex-col justify-between p-4 hover:opacity-90',
+          getColorForBoard(board)
         )}
-      </div>
-      <div className="self-end">
-        <div className="rounded-full bg-white/20 p-1">
-          <div className="h-4 w-4" />
+      >
+        <div>
+          <h3 className="font-semibold text-white uppercase">{board.title}</h3>
+          {board.description && (
+            <p className="mt-1 text-sm text-white/80">{board.description}</p>
+          )}
         </div>
-      </div>
-    </Card>
+        <div className="self-end">
+          <div className="rounded-full bg-white/20 p-1">
+            <div className="h-4 w-4" />
+          </div>
+        </div>
+      </Card>
+    </NextLink>
   );
 };
