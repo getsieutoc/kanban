@@ -3,8 +3,8 @@ import { getListsFromBoard } from '@/actions/lists';
 import { PageProps } from '@/types';
 import { ListContainer } from './components/list-container';
 import { CardItem } from './components/card-item';
-import { AddCardButton } from './components/add-card-button';
-import { AddNewList } from './components/add-list-button';
+import { AddNewCard } from './components/add-new-card';
+import { AddNewList } from './components/add-new-list';
 import { BoardHeader } from './components/board-header';
 import { notFound } from 'next/navigation';
 
@@ -33,12 +33,10 @@ export default async function BoardPage({
               <CardItem key={card.id} card={card} />
             ))}
 
-            <AddCardButton
+            <AddNewCard
+              boardId={boardId}
               listId={list.id}
-              // onClick={() => {
-              //   // We'll implement this later
-              //   console.log('Add card to list:', list.id);
-              // }}
+              totalCard={list.cards.length}
             />
           </ListContainer>
         ))}
