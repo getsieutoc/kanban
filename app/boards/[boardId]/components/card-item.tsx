@@ -19,7 +19,7 @@ export function CardItem({ id, columnId, index, card }: CardItemProps) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={`bg-accent cursor-pointer rounded-md p-2 shadow-sm ${'abc'}`}
+          className="bg-accent cursor-pointer rounded-md p-2 shadow-sm hover:bg-accent/80"
         >
           <div className="flex flex-col gap-2">
             <div className="text-sm">{card.title}</div>

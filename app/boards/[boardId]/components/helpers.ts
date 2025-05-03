@@ -1,31 +1,35 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ListWithPayload } from '@/types';
 
-export const reorder = (list: any, startIndex: number, endIndex: number) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
+export const reorder = (list: ListWithPayload, startIndex: number, endIndex: number): ListWithPayload => {
+  const cards = Array.from(list.cards);
+  const [removed] = cards.splice(startIndex, 1);
+  cards.splice(endIndex, 0, removed);
 
-  return result;
+  return {
+    ...list,
+    cards,
+  };
 };
 
 /**
  * Moves an item from one list to another list.
  */
 export const move = (
-  source: any,
-  destination: any,
-  droppableSource: any,
-  droppableDestination: any
-) => {
-  const sourceClone = Array.from(source);
-  const destClone = Array.from(destination);
-  const [removed] = sourceClone.splice(droppableSource.index, 1);
+  source: ListWithPayload,
+  destination: ListWithPayload,
+  droppableSource: { index: number },
+  droppableDestination: { index: number }
+): { [key: string]: ListWithPayload } => {
+  const sourceCards = Array.from(source.cards);
+  const destCards = Array.from(destination.cards);
+  const [removed] = sourceCards.splice(droppableSource.index, 1);
 
-  destClone.splice(droppableDestination.index, 0, removed);
+  destCards.splice(droppableDestination.index, 0, removed);
 
-  const result = {};
-  result[droppableSource.droppableId] = sourceClone;
-  result[droppableDestination.droppableId] = destClone;
+  const result = {
+    [source.id]: { ...source, cards: sourceCards },
+    [destination.id]: { ...destination, cards: destCards },
+  } as { [key: string]: ListWithPayload };
 
   return result;
 };

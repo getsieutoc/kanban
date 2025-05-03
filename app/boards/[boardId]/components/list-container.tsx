@@ -17,14 +17,13 @@ export function ListContainer({ id, list, children }: ListContainerProps) {
         <Card
           ref={provided.innerRef}
           className="h-full w-64 shrink-0 p-2"
-          // style={getListStyle(snapshot.isDraggingOver)}
           {...provided.droppableProps}
         >
           <div className="mb-2 px-2">
             <h3 className="text-sm font-medium">{list.title}</h3>
           </div>
 
-          <div className={`flex min-h-[50px] flex-col gap-2 ${'abc'}`}>
+          <div className="flex min-h-[50px] flex-col gap-2">
             {children}
           </div>
         </Card>

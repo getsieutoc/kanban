@@ -17,50 +17,60 @@ export const BoardContainer = ({ lists }: BoardContainerProps) => {
   console.log('---------------------- re-render');
   const [state, setState] = useState(lists);
 
-  const onDragEnd = async (event: any) => {
+  const onDragEnd = async (event: {
+    source: { droppableId: string; index: number };
+    destination: { droppableId: string; index: number } | null;
+  }) => {
     const { source, destination } = event;
 
     // dropped outside the list
     if (!destination) {
       return;
     }
-    const sInd = +source.droppableId;
-    const dInd = +destination.droppableId;
+
+    const sourceList = state.find((list) => list.id === source.droppableId);
+    const destinationList = state.find((list) => list.id === destination.droppableId);
+
+    if (!sourceList || !destinationList) {
+      return;
+    }
+
+    // Save the original state for rollback in case of error
+    const originalState = [...state];
 
     try {
-      if (sInd === dInd) {
+      if (source.droppableId === destination.droppableId) {
         // Same list reordering
-        const items = reorder(state[sInd], source.index, destination.index);
-        const newState = [...state];
-        newState[sInd] = items;
+        const updatedList = reorder(sourceList, source.index, destination.index);
+        const newState = state.map((list) =>
+          list.id === source.droppableId ? updatedList : list
+        );
         setState(newState);
 
         // Update card order in database
-        const movedCard = state[sInd].cards[source.index];
+        const movedCard = sourceList.cards[source.index];
         await reorderCard({
           id: movedCard.id,
           order: destination.index,
         });
       } else {
         // Moving between lists
-        const result = move(state[sInd], state[dInd], source, destination);
-        const newState = [...state];
-        newState[sInd] = result[sInd];
-        newState[dInd] = result[dInd];
-
-        setState(newState.filter((group) => group.length));
+        const result = move(sourceList, destinationList, source, destination);
+        const newState = state.map((list) => result[list.id] || list);
+        setState(newState);
 
         // Update card order and list in database
-        const movedCard = state[sInd].cards[source.index];
+        const movedCard = sourceList.cards[source.index];
         await reorderCard({
           id: movedCard.id,
           order: destination.index,
-          listId: state[dInd].id,
+          listId: destinationList.id,
         });
       }
     } catch (error) {
+      // Rollback to original state if the server update fails
+      setState(originalState);
       console.error('Failed to update card order:', error);
-      // Could add error handling UI here
     }
   };
 
