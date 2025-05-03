@@ -46,3 +46,15 @@ export const createList = async (input: Prisma.ListCreateArgs) => {
 export const updateList = async (input: Prisma.ListUpdateArgs) => {
   return await prisma.list.update(input);
 };
+
+export const deleteList = async (id: string) => {
+  // First delete all cards in this list
+  await prisma.card.deleteMany({
+    where: { listId: id },
+  });
+  
+  // Then delete the list
+  return await prisma.list.delete({
+    where: { id },
+  });
+};

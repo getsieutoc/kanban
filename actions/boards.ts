@@ -32,3 +32,32 @@ export const createBoard = async (input: Prisma.BoardCreateInput) => {
 
   return board;
 };
+
+export const updateBoard = async (input: Prisma.BoardUpdateArgs) => {
+  return await prisma.board.update(input);
+};
+
+export const deleteBoard = async (id: string) => {
+  // First delete all associated lists and cards to avoid constraint errors
+  const lists = await prisma.list.findMany({
+    where: { boardId: id },
+    select: { id: true },
+  });
+  
+  const listIds = lists.map(list => list.id);
+  
+  // Delete all cards in those lists
+  await prisma.card.deleteMany({
+    where: { listId: { in: listIds } },
+  });
+  
+  // Delete all lists
+  await prisma.list.deleteMany({
+    where: { boardId: id },
+  });
+  
+  // Delete the board itself
+  return await prisma.board.delete({
+    where: { id },
+  });
+};

@@ -28,3 +28,9 @@ export const reorderCard = async ({
     },
   });
 };
+
+export const deleteCard = async (id: string) => {
+  return await prisma.card.delete({
+    where: { id },
+  });
+};

@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import { PageProps } from '@/types';
 
 import { AddNewList } from './components/add-new-list';
-import { BoardHeader } from './components/board-header';
 import { BoardContainer } from './components/board-container';
 
 export default async function BoardPage({
@@ -22,12 +21,14 @@ export default async function BoardPage({
   }
 
   return (
-    <div className="flex h-full flex-col">
-      <BoardHeader board={board} />
+    <div className="flex h-full flex-col p-6">
+      <BoardContainer 
+        lists={lists} 
+        boardId={boardId} 
+        title={board.title} 
+      />
 
-      <div className="flex h-full gap-3 overflow-x-auto p-6 pb-8">
-        <BoardContainer lists={lists} />
-
+      <div className="flex h-full gap-3 overflow-x-auto pb-8">
         <AddNewList boardId={boardId} totalList={lists.length} />
       </div>
     </div>
