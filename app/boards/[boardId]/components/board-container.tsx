@@ -18,6 +18,7 @@ import {
 
 import { ListContainer } from './list-container';
 import { CardItem } from './card-item';
+import { AddNewCard } from './add-new-card';
 import { move, reorder } from './helpers';
 
 type BoardContainerProps = {
@@ -127,6 +128,7 @@ export const BoardContainer = ({ lists, boardId, title }: BoardContainerProps) =
               {l.cards.map((c, j) => (
                 <CardItem key={c.id} id={c.id} index={j} columnId={l.id} card={c} />
               ))}
+              <AddNewCard boardId={boardId} listId={l.id} totalCard={l.cards.length} />
             </ListContainer>
           ))}
         </div>
