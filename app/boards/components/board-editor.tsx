@@ -29,9 +29,9 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Visibility } from '@prisma/client';
+import { Visibility, ReactNode } from '@/types';
 
-import { ReactNode, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createBoard } from '@/actions/boards';
 import { useAuth } from '@/hooks/use-auth';

@@ -1,7 +1,7 @@
 'use server';
 
-import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma-client';
+import { Prisma } from '@/types';
 
 export const getListsFromBoard = async (boardId: string) => {
   return await prisma.list.findMany({

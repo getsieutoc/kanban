@@ -1,6 +1,6 @@
 'use server';
 
-import { MembershipRole, MembershipStatus, Prisma } from '@prisma/client';
+import { MembershipRole, MembershipStatus, Prisma } from '@/prisma/client';
 import { prisma } from '@/lib/prisma-client';
 
 export const getTenants = async (input?: Prisma.TenantFindManyArgs) => {

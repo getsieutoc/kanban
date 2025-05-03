@@ -16,28 +16,31 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Workspace, CreateWorkspaceInput } from '@/types/workspace';
+import { Tenant, Prisma } from '@/types';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required').max(50, 'Name is too long'),
-}) satisfies z.ZodType<CreateWorkspaceInput>;
+}) satisfies z.ZodType<Prisma.TenantCreateInput>;
 
 interface AddWorkspaceFormProps {
-  onSuccess?: (workspace: Workspace) => void;
+  onSuccess?: (workspace: Tenant) => void;
   onCancel?: () => void;
 }
 
-export function AddWorkspaceForm({ onSuccess, onCancel }: AddWorkspaceFormProps) {
+export function AddWorkspaceForm({
+  onSuccess,
+  onCancel,
+}: AddWorkspaceFormProps) {
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const form = useForm<CreateWorkspaceInput>({
+  const form = useForm<Prisma.TenantCreateInput>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
     },
   });
 
-  async function onSubmit(values: CreateWorkspaceInput) {
+  async function onSubmit(values: Prisma.TenantCreateInput) {
     try {
       setIsLoading(true);
       const response = await fetch('/api/tenants', {

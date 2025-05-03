@@ -1,6 +1,6 @@
 'use server';
 
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@/prisma/client';
 import { prisma } from '@/lib/prisma-client';
 
 export const createCard = async (input: Prisma.CardCreateArgs) => {

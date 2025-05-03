@@ -18,6 +18,7 @@ const eslintConfig = [
         {
           ignoreRestSiblings: true,
           varsIgnorePattern: '^_',
+          argsIgnorePattern: '^_',
         },
       ],
     },

@@ -1,7 +1,5 @@
 'use client';
 
-import { createCard } from '@/actions/cards';
-import { createList } from '@/actions/lists';
 import { Plus } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,13 +22,16 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useAuth } from '@/hooks/use-auth';
-import { clearCache } from '@/lib/cache';
+import { Input } from '@/components/ui/input';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo, useState } from 'react';
+import { createCard } from '@/actions/cards';
+import { createList } from '@/actions/lists';
+import { useAuth } from '@/hooks/use-auth';
 import { useForm } from 'react-hook-form';
+import { useMemo, useState } from 'react';
+import { clearCache } from '@/lib/cache';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
@@ -58,7 +59,7 @@ export function AddNewCard({ boardId, listId, totalCard }: AddCardButtonProps) {
       title: '',
       order: totalCard,
     };
-  }, []);
+  }, [totalCard]);
 
   const form = useForm<FormInputs>({
     resolver: zodResolver(cardSchema),

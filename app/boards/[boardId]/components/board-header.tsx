@@ -1,6 +1,6 @@
 'use client';
 
-import { Board } from '@prisma/client';
+import { Board } from '@/types';
 
 type BoardHeaderProps = {
   board: Board;

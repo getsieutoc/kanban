@@ -1,25 +1,29 @@
-# Kanban System
+# Sieutoc Kanban
 
 A self-hosted kanban system designed for developers, startup founders, and small business owners who need a lightweight, easy-to-deploy task management solution.
 
 ## Features
 
 - **Workspace Management**
+
   - Create and manage multiple workspaces
   - User permissions per workspace
   - Workspace settings and preferences
 
 - **Board Management**
+
   - Create, edit, and delete boards
   - Board-level configurations
   - Organize boards within workspaces
 
 - **Column Management**
+
   - Customizable columns
   - WIP (Work in Progress) limits
   - Column ordering
 
 - **Task Card Management**
+
   - Create and edit task cards
   - Drag-and-drop functionality
   - Basic card fields (title, description, assignees, due date)
@@ -33,6 +37,7 @@ A self-hosted kanban system designed for developers, startup founders, and small
 ## Technology Stack
 
 - **Frontend**
+
   - Next.js 14 (App Router)
   - React Server Components
   - TypeScript

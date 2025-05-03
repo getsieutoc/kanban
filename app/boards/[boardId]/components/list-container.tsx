@@ -1,8 +1,8 @@
 'use client';
 
+import { Droppable } from '@hello-pangea/dnd';
 import { Card } from '@/components/ui/card';
-import { List } from '@prisma/client';
-import { useDroppable } from '@dnd-kit/react';
+import { List } from '@/types';
 
 type ListContainerProps = {
   id: string;
@@ -11,28 +11,24 @@ type ListContainerProps = {
 };
 
 export function ListContainer({ id, list, children }: ListContainerProps) {
-  const { ref, isDropTarget, droppable } = useDroppable({
-    id,
-    data: {
-      type: 'list',
-    },
-  });
-
   return (
-    <Card className="h-full w-64 shrink-0 p-2">
-      <div className="mb-2 px-2">
-        <h3 className="text-sm font-medium">{list.title}</h3>
-      </div>
+    <Droppable droppableId={`${id}`}>
+      {(provided, _snapshot) => (
+        <Card
+          ref={provided.innerRef}
+          className="h-full w-64 shrink-0 p-2"
+          // style={getListStyle(snapshot.isDraggingOver)}
+          {...provided.droppableProps}
+        >
+          <div className="mb-2 px-2">
+            <h3 className="text-sm font-medium">{list.title}</h3>
+          </div>
 
-      <div 
-        ref={ref}
-        {...droppable}
-        className={`flex flex-col gap-2 min-h-[50px] ${
-          isDropTarget ? 'bg-muted/50' : ''
-        }`}
-      >
-        {children}
-      </div>
-    </Card>
+          <div className={`flex min-h-[50px] flex-col gap-2 ${'abc'}`}>
+            {children}
+          </div>
+        </Card>
+      )}
+    </Droppable>
   );
 }

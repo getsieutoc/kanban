@@ -1,11 +1,13 @@
-import { Prisma } from '@prisma/client';
 import { type SearchParams } from 'nuqs';
 import { type ReactNode } from 'react';
+import { Prisma } from '@/types';
 
 import { userIncludes } from '@/lib/rich-includes';
 import { getListsFromBoard } from '@/actions/lists';
 
-export * from '@prisma/client';
+export type { ReactNode, Component } from 'react';
+
+export * from '@/prisma/client';
 
 export type LayoutProps = {
   children: ReactNode;
