@@ -27,7 +27,11 @@ type BoardContainerProps = {
   title: string;
 };
 
-export const BoardContainer = ({ lists, boardId, title }: BoardContainerProps) => {
+export const BoardContainer = ({
+  lists,
+  boardId,
+  title,
+}: BoardContainerProps) => {
   const router = useRouter();
   const [state, setState] = useState(lists);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -38,8 +42,8 @@ export const BoardContainer = ({ lists, boardId, title }: BoardContainerProps) =
       setDeleting(true);
       await deleteBoard(boardId);
       router.push('/boards');
-    } catch (error) {
-      console.error(error);
+    } catch {
+      console.error('Problem while deleting board');
     } finally {
       setDeleting(false);
       setDeleteModalOpen(false);
@@ -58,7 +62,9 @@ export const BoardContainer = ({ lists, boardId, title }: BoardContainerProps) =
     }
 
     const sourceList = state.find((list) => list.id === source.droppableId);
-    const destinationList = state.find((list) => list.id === destination.droppableId);
+    const destinationList = state.find(
+      (list) => list.id === destination.droppableId
+    );
 
     if (!sourceList || !destinationList) {
       return;
@@ -70,7 +76,11 @@ export const BoardContainer = ({ lists, boardId, title }: BoardContainerProps) =
     try {
       if (source.droppableId === destination.droppableId) {
         // Same list reordering
-        const updatedList = reorder(sourceList, source.index, destination.index);
+        const updatedList = reorder(
+          sourceList,
+          source.index,
+          destination.index
+        );
         const newState = state.map((list) =>
           list.id === source.droppableId ? updatedList : list
         );
@@ -126,9 +136,19 @@ export const BoardContainer = ({ lists, boardId, title }: BoardContainerProps) =
           {state.map((l) => (
             <ListContainer key={l.id} id={l.id} list={l}>
               {l.cards.map((c, j) => (
-                <CardItem key={c.id} id={c.id} index={j} columnId={l.id} card={c} />
+                <CardItem
+                  key={c.id}
+                  id={c.id}
+                  index={j}
+                  columnId={l.id}
+                  card={c}
+                />
               ))}
-              <AddNewCard boardId={boardId} listId={l.id} totalCard={l.cards.length} />
+              <AddNewCard
+                boardId={boardId}
+                listId={l.id}
+                totalCard={l.cards.length}
+              />
             </ListContainer>
           ))}
         </div>

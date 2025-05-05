@@ -22,7 +22,7 @@ export const createTenant = async (
   user: Prisma.UserCreateInput
 ) => {
   if (!user.id) {
-    throw new Error('Unauthorized');
+    throw new Error('User ID is required to create a tenant');
   }
 
   const tenant = await prisma.tenant.create({

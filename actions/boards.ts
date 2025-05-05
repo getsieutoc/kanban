@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma-client';
 import { Prisma } from '@/types';
 
 import { createDefaultLists } from './lists';
-
+ 
 export const getBoards = async (input?: Prisma.BoardFindManyArgs) => {
   return await prisma.board.findMany(input);
 };
