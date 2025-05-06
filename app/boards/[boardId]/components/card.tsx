@@ -4,6 +4,12 @@ import {
   draggable,
   dropTargetForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source';
 import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
 import { type RefObject, useEffect, useRef, useState } from 'react';
@@ -23,7 +29,12 @@ import {
   isDraggingACard,
 } from '@/lib/data';
 import { isShallowEqual } from '@/lib/is-shallow-equal';
-import { type Card } from '@/types';
+import { type CardWithPayload } from '@/types';
+import { Button } from '@/components/ui/button';
+import { MoreHorizontal } from '@/components/icons';
+import { deleteCard } from '@/actions/cards';
+// import { clearCache } from '@/lib/cache';
+import { AlertModal } from '@/components/common/alert-modal';
 
 type TCardState =
   | {
@@ -49,7 +60,7 @@ type TCardState =
 const idle: TCardState = { type: 'idle' };
 
 const innerStyles: { [Key in TCardState['type']]?: string } = {
-  idle: 'hover:outline outline-2 outline-neutral-50 cursor-grab',
+  idle: 'hover:outline-1 outline-0 outline-neutral-50 cursor-grab',
   'is-dragging': 'opacity-40',
 };
 
@@ -77,40 +88,78 @@ const CardDisplay = ({
   outerRef,
   innerRef,
 }: {
-  card: Card;
+  card: CardWithPayload;
   state: TCardState;
   outerRef?: RefObject<HTMLDivElement | null>;
   innerRef?: RefObject<HTMLDivElement | null>;
 }) => {
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      setDeleting(true);
+      await deleteCard(card.id);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setDeleting(false);
+      setDeleteModalOpen(false);
+    }
+  };
   return (
-    <div
-      ref={outerRef}
-      className={`flex flex-shrink-0 flex-col gap-2 px-3 py-1 ${outerStyles[state.type]}`}
-    >
-      {/* Put a shadow before the item if closer to the top edge */}
-      {state.type === 'is-over' && state.closestEdge === 'top' ? (
-        <CardShadow dragging={state.dragging} />
-      ) : null}
+    <>
       <div
-        ref={innerRef}
-        className={`rounded bg-slate-700 p-2 text-slate-300 ${innerStyles[state.type]}`}
-        style={
-          state.type === 'preview'
-            ? {
-                width: state.dragging.width,
-                height: state.dragging.height,
-                transform: !isSafari() ? 'rotate(4deg)' : undefined,
-              }
-            : undefined
-        }
+        ref={outerRef}
+        className={`flex flex-shrink-0 flex-col gap-2 px-3 py-1 ${outerStyles[state.type]}`}
       >
-        <div>{card.title}</div>
+        {/* Put a shadow before the item if closer to the top edge */}
+        {state.type === 'is-over' && state.closestEdge === 'top' ? (
+          <CardShadow dragging={state.dragging} />
+        ) : null}
+        <div
+          ref={innerRef}
+          className={`flex items-center justify-between rounded bg-slate-700 p-2 text-slate-300 ${innerStyles[state.type]}`}
+          style={
+            state.type === 'preview'
+              ? {
+                  width: state.dragging.width,
+                  height: state.dragging.height,
+                  transform: !isSafari() ? 'rotate(4deg)' : undefined,
+                }
+              : undefined
+          }
+        >
+          <div className="text-sm">{card.title}</div>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setDeleteModalOpen(true)}>
+                Delete Card
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        {/* Put a shadow after the item if closer to the bottom edge */}
+        {state.type === 'is-over' && state.closestEdge === 'bottom' ? (
+          <CardShadow dragging={state.dragging} />
+        ) : null}
       </div>
-      {/* Put a shadow after the item if closer to the bottom edge */}
-      {state.type === 'is-over' && state.closestEdge === 'bottom' ? (
-        <CardShadow dragging={state.dragging} />
-      ) : null}
-    </div>
+
+      <AlertModal
+        isOpen={deleteModalOpen}
+        onCloseAction={() => setDeleteModalOpen(false)}
+        onConfirmAction={handleDelete}
+        loading={deleting}
+        title="Delete Card"
+        description="Are you sure you want to delete this card? This action cannot be undone."
+      />
+    </>
   );
 };
 
@@ -118,7 +167,7 @@ export const CardItem = ({
   card,
   columnId,
 }: {
-  card: Card;
+  card: CardWithPayload;
   columnId: string;
 }) => {
   const outerRef = useRef<HTMLDivElement | null>(null);
@@ -237,6 +286,7 @@ export const CardItem = ({
       })
     );
   }, [card, columnId]);
+
   return (
     <>
       <CardDisplay

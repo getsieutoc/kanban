@@ -15,8 +15,12 @@ import {
   isDraggingAColumn,
 } from '@/lib/data';
 import { unsafeOverflowAutoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/unsafe-overflow/element';
+import {
+  blockBoardPanningAttr,
+  // type CardWithPayload,
+  type ColumnWithPayload,
+} from '@/types';
 import { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
-import { blockBoardPanningAttr, type ColumnWithPayload } from '@/types';
 import { bindAll } from 'bind-event-listener';
 import invariant from 'tiny-invariant';
 
@@ -30,20 +34,20 @@ type BoardProps = {
 };
 
 export const Board = ({ initial }: BoardProps) => {
-  const handleCardCreate = (columnId: string, card: CardWithPayload) => {
-    setData((prevData) => {
-      const columns = [...prevData.columns];
-      const columnIndex = columns.findIndex((col) => col.id === columnId);
-
-      if (columnIndex !== -1) {
-        const column = { ...columns[columnIndex] };
-        column.cards = [...column.cards, card];
-        columns[columnIndex] = column;
-      }
-
-      return { ...prevData, columns };
-    });
-  };
+  // const handleCardCreate = (columnId: string, card: CardWithPayload) => {
+  //   setData((prevData) => {
+  //     const columns = [...prevData.columns];
+  //     const columnIndex = columns.findIndex((col) => col.id === columnId);
+  //
+  //     if (columnIndex !== -1) {
+  //       const column = { ...columns[columnIndex] };
+  //       column.cards = [...column.cards, card];
+  //       columns[columnIndex] = column;
+  //     }
+  //
+  //     return { ...prevData, columns };
+  //   });
+  // };
 
   const [data, setData] = useState(initial);
 
@@ -387,12 +391,7 @@ export const Board = ({ initial }: BoardProps) => {
         ref={scrollableRef}
       >
         {data.columns.map((column) => (
-          <Column
-            key={column.id}
-            column={column}
-            boardId={column.boardId}
-            onCardCreate={handleCardCreate}
-          />
+          <Column key={column.id} column={column} boardId={column.boardId} />
         ))}
       </div>
     </div>
