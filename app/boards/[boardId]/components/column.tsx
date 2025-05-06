@@ -67,17 +67,11 @@ const CardColumn = memo(function CardColumn({
   column: ColumnWithPayload;
 }) {
   return column.cards.map((card) => (
-    <CardItem key={card.id} card={card} columnId={column.id} />
+    <CardItem key={card.id} card={card} column={column} />
   ));
 });
 
-export function Column({
-  boardId,
-  column,
-}: {
-  boardId: string;
-  column: ColumnWithPayload;
-}) {
+export function Column({ column }: { column: ColumnWithPayload }) {
   const scrollableRef = useRef<HTMLDivElement | null>(null);
 
   const outerFullHeightRef = useRef<HTMLDivElement | null>(null);
@@ -291,7 +285,7 @@ export function Column({
             ) : null}
           </div>
           <div className="flex flex-row gap-2 p-3">
-            <AddNewCard boardId={boardId} columnId={column.id} />
+            <AddNewCard boardId={column.boardId} columnId={column.id} />
           </div>
         </div>
       </div>

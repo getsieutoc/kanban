@@ -1,12 +1,14 @@
 'use client';
 
+import { unsafeOverflowAutoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/unsafe-overflow/element';
 import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
 import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import { reorderWithEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/reorder-with-edge';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useControllableState } from '@/hooks/use-controllable-state';
+import { useContext, useEffect, useRef } from 'react';
 import {
   isCardData,
   isCardDropTargetData,
@@ -14,7 +16,6 @@ import {
   isDraggingACard,
   isDraggingAColumn,
 } from '@/lib/data';
-import { unsafeOverflowAutoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/unsafe-overflow/element';
 import {
   blockBoardPanningAttr,
   // type CardWithPayload,
@@ -34,22 +35,10 @@ type BoardProps = {
 };
 
 export const Board = ({ initial }: BoardProps) => {
-  // const handleCardCreate = (columnId: string, card: CardWithPayload) => {
-  //   setData((prevData) => {
-  //     const columns = [...prevData.columns];
-  //     const columnIndex = columns.findIndex((col) => col.id === columnId);
-  //
-  //     if (columnIndex !== -1) {
-  //       const column = { ...columns[columnIndex] };
-  //       column.cards = [...column.cards, card];
-  //       columns[columnIndex] = column;
-  //     }
-  //
-  //     return { ...prevData, columns };
-  //   });
-  // };
-
-  const [data, setData] = useState(initial);
+  const [data, setData] = useControllableState({
+    prop: initial,
+    defaultProp: { columns: [] },
+  });
 
   const scrollableRef = useRef<HTMLDivElement | null>(null);
 
@@ -391,7 +380,7 @@ export const Board = ({ initial }: BoardProps) => {
         ref={scrollableRef}
       >
         {data.columns.map((column) => (
-          <Column key={column.id} column={column} boardId={column.boardId} />
+          <Column key={column.id} column={column} />
         ))}
       </div>
     </div>

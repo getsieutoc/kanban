@@ -29,12 +29,13 @@ import {
   isDraggingACard,
 } from '@/lib/data';
 import { isShallowEqual } from '@/lib/is-shallow-equal';
-import { type CardWithPayload } from '@/types';
+import { Column, type CardWithPayload } from '@/types';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from '@/components/icons';
 import { deleteCard } from '@/actions/cards';
 // import { clearCache } from '@/lib/cache';
 import { AlertModal } from '@/components/common/alert-modal';
+import { clearCache } from '@/lib/cache';
 
 type TCardState =
   | {
@@ -83,11 +84,13 @@ export function CardShadow({ dragging }: { dragging: DOMRect }) {
 }
 
 const CardDisplay = ({
+  boardId,
   card,
   state,
   outerRef,
   innerRef,
 }: {
+  boardId: string;
   card: CardWithPayload;
   state: TCardState;
   outerRef?: RefObject<HTMLDivElement | null>;
@@ -105,6 +108,7 @@ const CardDisplay = ({
     } finally {
       setDeleting(false);
       setDeleteModalOpen(false);
+      clearCache(`/boards/${boardId}`);
     }
   };
   return (
@@ -165,10 +169,10 @@ const CardDisplay = ({
 
 export const CardItem = ({
   card,
-  columnId,
+  column,
 }: {
   card: CardWithPayload;
-  columnId: string;
+  column: Column;
 }) => {
   const outerRef = useRef<HTMLDivElement | null>(null);
 
@@ -187,7 +191,7 @@ export const CardItem = ({
         getInitialData: ({ element }) =>
           getCardData({
             card,
-            columnId,
+            columnId: column.id,
             rect: element.getBoundingClientRect(),
           }),
         onGenerateDragPreview({ nativeSetDragImage, location, source }) {
@@ -221,7 +225,7 @@ export const CardItem = ({
         getIsSticky: () => true,
         canDrop: isDraggingACard,
         getData: ({ element, input }) => {
-          const data = getCardDropTargetData({ card, columnId });
+          const data = getCardDropTargetData({ card, columnId: column.id });
           return attachClosestEdge(data, {
             element,
             input,
@@ -285,7 +289,7 @@ export const CardItem = ({
         },
       })
     );
-  }, [card, columnId]);
+  }, [card, column]);
 
   return (
     <>
@@ -294,10 +298,11 @@ export const CardItem = ({
         innerRef={innerRef}
         state={state}
         card={card}
+        boardId={column.boardId}
       />
       {state.type === 'preview'
         ? createPortal(
-            <CardDisplay state={state} card={card} />,
+            <CardDisplay state={state} card={card} boardId={column.boardId} />,
             state.container
           )
         : null}
