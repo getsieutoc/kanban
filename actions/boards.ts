@@ -23,12 +23,17 @@ export const getBoard = async (id: string) => {
   });
 };
 
-export const createBoard = async (input: Prisma.BoardCreateInput) => {
+export const createBoard = async (
+  input: Prisma.BoardCreateInput,
+  defaultLists?: boolean
+) => {
   const board = await prisma.board.create({
     data: input,
   });
 
-  await createDefaultLists(board.id);
+  if (defaultLists) {
+    await createDefaultLists(board.id);
+  }
 
   return board;
 };

@@ -1,6 +1,5 @@
 'use client';
 
-import { DragDropContext } from '@hello-pangea/dnd';
 import { reorderCard } from '@/actions/cards';
 import { ListWithPayload } from '@/types';
 import { useState } from 'react';
@@ -28,13 +27,16 @@ type BoardContainerProps = {
 };
 
 export const BoardContainer = ({
-  lists,
+  lists: listsInput,
   boardId,
   title,
 }: BoardContainerProps) => {
   const router = useRouter();
-  const [state, setState] = useState(lists);
+
+  const [lists, setLists] = useState(listsInput);
+
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -61,8 +63,9 @@ export const BoardContainer = ({
       return;
     }
 
-    const sourceList = state.find((list) => list.id === source.droppableId);
-    const destinationList = state.find(
+    const sourceList = lists.find((list) => list.id === source.droppableId);
+
+    const destinationList = lists.find(
       (list) => list.id === destination.droppableId
     );
 
@@ -71,7 +74,7 @@ export const BoardContainer = ({
     }
 
     // Save the original state for rollback in case of error
-    const originalState = [...state];
+    const originalState = [...lists];
 
     try {
       if (source.droppableId === destination.droppableId) {
@@ -81,10 +84,10 @@ export const BoardContainer = ({
           source.index,
           destination.index
         );
-        const newState = state.map((list) =>
+        const newState = lists.map((list) =>
           list.id === source.droppableId ? updatedList : list
         );
-        setState(newState);
+        setLists(newState);
 
         // Update card order in database
         const movedCard = sourceList.cards[source.index];
@@ -95,8 +98,8 @@ export const BoardContainer = ({
       } else {
         // Moving between lists
         const result = move(sourceList, destinationList, source, destination);
-        const newState = state.map((list) => result[list.id] || list);
-        setState(newState);
+        const newState = lists.map((list) => result[list.id] || list);
+        setLists(newState);
 
         // Update card order and list in database
         const movedCard = sourceList.cards[source.index];
@@ -106,10 +109,10 @@ export const BoardContainer = ({
           listId: destinationList.id,
         });
       }
-    } catch (error) {
+    } catch {
       // Rollback to original state if the server update fails
-      setState(originalState);
-      console.error('Failed to update card order:', error);
+      setLists(originalState);
+      console.error('Failed to update card order');
     }
   };
 
@@ -131,33 +134,32 @@ export const BoardContainer = ({
         </DropdownMenu>
       </div>
 
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex gap-4">
-          {state.map((l) => (
-            <ListContainer key={l.id} id={l.id} list={l}>
-              {l.cards.map((c, j) => (
-                <CardItem
-                  key={c.id}
-                  id={c.id}
-                  index={j}
-                  columnId={l.id}
-                  card={c}
-                />
-              ))}
-              <AddNewCard
+      <div className="flex gap-4">
+        {lists.map((l) => (
+          <ListContainer key={l.id} id={l.id} list={l}>
+            {l.cards.map((c, j) => (
+              <CardItem
+                key={c.id}
+                id={c.id}
+                index={j}
+                columnId={l.id}
                 boardId={boardId}
-                listId={l.id}
-                totalCard={l.cards.length}
+                card={c}
               />
-            </ListContainer>
-          ))}
-        </div>
-      </DragDropContext>
+            ))}
+            <AddNewCard
+              boardId={boardId}
+              listId={l.id}
+              totalCard={l.cards.length}
+            />
+          </ListContainer>
+        ))}
+      </div>
 
       <AlertModal
         isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDelete}
+        onCloseAction={() => setDeleteModalOpen(false)}
+        onConfirmAction={handleDelete}
         loading={deleting}
         title="Delete Board"
         description="Are you sure you want to delete this board? This will also delete all lists and cards within this board and cannot be undone."

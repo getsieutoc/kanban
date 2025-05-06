@@ -9,6 +9,10 @@ export type { ReactNode, Component } from 'react';
 
 export * from '@/prisma/client';
 
+export * from './settings';
+
+export const blockBoardPanningAttr = 'data-block-board-panning' as const;
+
 export type LayoutProps = {
   children: ReactNode;
 };

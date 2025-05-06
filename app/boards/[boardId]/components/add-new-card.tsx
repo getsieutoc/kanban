@@ -16,7 +16,11 @@ type AddCardButtonProps = {
   totalCard: number;
 };
 
-export function AddNewCard({ boardId, listId, totalCard }: AddCardButtonProps) {
+export const AddNewCard = ({
+  boardId,
+  listId,
+  totalCard,
+}: AddCardButtonProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,7 +53,7 @@ export function AddNewCard({ boardId, listId, totalCard }: AddCardButtonProps) {
         setIsEditing(false);
         clearCache(`/boards/${boardId}`);
       }
-    } catch (_err) {
+    } catch {
       toast.error('Failed to create card');
     } finally {
       setLoading(false);
@@ -111,4 +115,4 @@ export function AddNewCard({ boardId, listId, totalCard }: AddCardButtonProps) {
       </div>
     </Card>
   );
-}
+};
