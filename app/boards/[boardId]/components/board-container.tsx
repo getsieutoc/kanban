@@ -1,7 +1,7 @@
 'use client';
 
 import { reorderCard } from '@/actions/cards';
-import { ListWithPayload } from '@/types';
+import { ColumnWithPayload } from '@/types';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -15,25 +15,25 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { ListContainer } from './list-container';
+import { ColumnContainer } from './column-container';
 import { CardItem } from './card-item';
 import { AddNewCard } from './add-new-card';
 import { move, reorder } from './helpers';
 
 type BoardContainerProps = {
-  lists: ListWithPayload[];
+  columns: ColumnWithPayload[];
   boardId: string;
   title: string;
 };
 
 export const BoardContainer = ({
-  lists: listsInput,
+  columns: columnsInput,
   boardId,
   title,
 }: BoardContainerProps) => {
   const router = useRouter();
 
-  const [lists, setLists] = useState(listsInput);
+  const [columns, setColumns] = useState(columnsInput);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
@@ -58,60 +58,67 @@ export const BoardContainer = ({
   }) => {
     const { source, destination } = event;
 
-    // dropped outside the list
+    // dropped outside the column
     if (!destination) {
       return;
     }
 
-    const sourceList = lists.find((list) => list.id === source.droppableId);
-
-    const destinationList = lists.find(
-      (list) => list.id === destination.droppableId
+    const sourceColumn = columns.find(
+      (column) => column.id === source.droppableId
     );
 
-    if (!sourceList || !destinationList) {
+    const destinationColumn = columns.find(
+      (column) => column.id === destination.droppableId
+    );
+
+    if (!sourceColumn || !destinationColumn) {
       return;
     }
 
     // Save the original state for rollback in case of error
-    const originalState = [...lists];
+    const originalState = [...columns];
 
     try {
       if (source.droppableId === destination.droppableId) {
-        // Same list reordering
-        const updatedList = reorder(
-          sourceList,
+        // Same column reordering
+        const updatedColumn = reorder(
+          sourceColumn,
           source.index,
           destination.index
         );
-        const newState = lists.map((list) =>
-          list.id === source.droppableId ? updatedList : list
+        const newState = columns.map((column) =>
+          column.id === source.droppableId ? updatedColumn : column
         );
-        setLists(newState);
+        setColumns(newState);
 
         // Update card order in database
-        const movedCard = sourceList.cards[source.index];
+        const movedCard = sourceColumn.cards[source.index];
         await reorderCard({
           id: movedCard.id,
           order: destination.index,
         });
       } else {
-        // Moving between lists
-        const result = move(sourceList, destinationList, source, destination);
-        const newState = lists.map((list) => result[list.id] || list);
-        setLists(newState);
+        // Moving between columns
+        const result = move(
+          sourceColumn,
+          destinationColumn,
+          source,
+          destination
+        );
+        const newState = columns.map((column) => result[column.id] || column);
+        setColumns(newState);
 
-        // Update card order and list in database
-        const movedCard = sourceList.cards[source.index];
+        // Update card order and column in database
+        const movedCard = sourceColumn.cards[source.index];
         await reorderCard({
           id: movedCard.id,
           order: destination.index,
-          listId: destinationList.id,
+          columnId: destinationColumn.id,
         });
       }
     } catch {
       // Rollback to original state if the server update fails
-      setLists(originalState);
+      setColumns(originalState);
       console.error('Failed to update card order');
     }
   };
@@ -135,8 +142,8 @@ export const BoardContainer = ({
       </div>
 
       <div className="flex gap-4">
-        {lists.map((l) => (
-          <ListContainer key={l.id} id={l.id} list={l}>
+        {columns.map((l) => (
+          <ColumnContainer key={l.id} id={l.id} column={l}>
             {l.cards.map((c, j) => (
               <CardItem
                 key={c.id}
@@ -149,10 +156,10 @@ export const BoardContainer = ({
             ))}
             <AddNewCard
               boardId={boardId}
-              listId={l.id}
+              columnId={l.id}
               totalCard={l.cards.length}
             />
-          </ListContainer>
+          </ColumnContainer>
         ))}
       </div>
 
@@ -162,7 +169,7 @@ export const BoardContainer = ({
         onConfirmAction={handleDelete}
         loading={deleting}
         title="Delete Board"
-        description="Are you sure you want to delete this board? This will also delete all lists and cards within this board and cannot be undone."
+        description="Are you sure you want to delete this board? This will also delete all columns and cards within this board and cannot be undone."
       />
     </>
   );

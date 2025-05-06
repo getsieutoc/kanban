@@ -9,7 +9,7 @@ import {
   NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuList,
+  NavigationMenuColumn,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 import { Separator } from '@/components/ui/separator';
@@ -84,7 +84,7 @@ export const Header = () => {
         {/*
         <div className="hidden flex-row items-center justify-start gap-4 lg:flex">
           <NavigationMenu className="flex items-start justify-start">
-            <NavigationMenuList className="flex flex-row justify-start gap-4">
+            <NavigationMenuColumn className="flex flex-row justify-start gap-4">
               {navigationItems.map((item) => (
                 <NavigationMenuItem key={item.title}>
                   {item.href ? (
@@ -131,7 +131,7 @@ export const Header = () => {
                   )}
                 </NavigationMenuItem>
               ))}
-            </NavigationMenuList>
+            </NavigationMenuColumn>
           </NavigationMenu>
         </div>
         */}

@@ -20,7 +20,6 @@ export default async function BoardsPage() {
   }
 
   const boards = await getBoardsFromTenant(activeTenant.id);
-  console.log('### boards: ', boards);
 
   return (
     <div className="container mx-auto py-6">

@@ -1,3 +1,12 @@
+export const cardIncludes = {
+  assignees: true,
+  labels: {
+    include: {
+      label: true,
+    },
+  },
+};
+
 export const tenantIncludes = {
   projects: {
     where: { deletedAt: null },

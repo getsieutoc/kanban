@@ -14,17 +14,17 @@ export const updateCard = async (input: Prisma.CardUpdateArgs) => {
 export const reorderCard = async ({
   id,
   order,
-  listId
+  columnId,
 }: {
   id: string;
   order: number;
-  listId?: string;
+  columnId?: string;
 }) => {
   return await prisma.card.update({
     where: { id },
     data: {
       order,
-      ...(listId && { listId }),
+      ...(columnId && { columnId }),
     },
   });
 };

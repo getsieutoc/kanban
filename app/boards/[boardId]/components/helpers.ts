@@ -1,25 +1,29 @@
-import { ListWithPayload } from '@/types';
+import { ColumnWithPayload } from '@/types';
 
-export const reorder = (list: ListWithPayload, startIndex: number, endIndex: number): ListWithPayload => {
-  const cards = Array.from(list.cards);
+export const reorder = (
+  column: ColumnWithPayload,
+  startIndex: number,
+  endIndex: number
+): ColumnWithPayload => {
+  const cards = Array.from(column.cards);
   const [removed] = cards.splice(startIndex, 1);
   cards.splice(endIndex, 0, removed);
 
   return {
-    ...list,
+    ...column,
     cards,
   };
 };
 
 /**
- * Moves an item from one list to another list.
+ * Moves an item from one column to another column.
  */
 export const move = (
-  source: ListWithPayload,
-  destination: ListWithPayload,
+  source: ColumnWithPayload,
+  destination: ColumnWithPayload,
   droppableSource: { index: number },
   droppableDestination: { index: number }
-): { [key: string]: ListWithPayload } => {
+): { [key: string]: ColumnWithPayload } => {
   const sourceCards = Array.from(source.cards);
   const destCards = Array.from(destination.cards);
   const [removed] = sourceCards.splice(droppableSource.index, 1);
@@ -29,7 +33,7 @@ export const move = (
   const result = {
     [source.id]: { ...source, cards: sourceCards },
     [destination.id]: { ...destination, cards: destCards },
-  } as { [key: string]: ListWithPayload };
+  } as { [key: string]: ColumnWithPayload };
 
   return result;
 };

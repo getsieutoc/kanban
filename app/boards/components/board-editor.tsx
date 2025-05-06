@@ -96,10 +96,15 @@ export const AddNewBoard = ({ trigger }: AddNewBoardProps) => {
         throw new Error('User is not associated with a tenant');
       }
 
-      const newBoard = await createBoard({
-        ...input,
-        tenant: { connect: { id: user.activeTenantId } },
-      });
+      const newBoard = await createBoard(
+        {
+          ...input,
+          tenant: { connect: { id: user.activeTenantId } },
+        },
+        {
+          createDefaultColumns: true,
+        }
+      );
 
       if (newBoard) {
         console.log('New board created', newBoard);
@@ -108,6 +113,7 @@ export const AddNewBoard = ({ trigger }: AddNewBoardProps) => {
         clearCache('/boards');
       }
     } catch (_err) {
+      console.log('### _err: ', _err);
       toast.error('Failed to create board');
     } finally {
       setLoading(false);

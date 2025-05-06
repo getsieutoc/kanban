@@ -1,24 +1,13 @@
-import { Card } from '@/types';
-
-export type TCard = {
-  id: string;
-  description: string;
-};
-
-export type TColumn = {
-  id: string;
-  title: string;
-  cards: TCard[];
-};
+import type { CardWithPayload, ColumnWithPayload } from '@/types';
 
 export type TBoard = {
-  columns: TColumn[];
+  columns: ColumnWithPayload[];
 };
 
 const cardKey = Symbol('card');
 export type TCardData = {
   [cardKey]: true;
-  card: Card;
+  card: CardWithPayload;
   columnId: string;
   rect: DOMRect;
 };
@@ -53,7 +42,7 @@ export function isDraggingACard({
 const cardDropTargetKey = Symbol('card-drop-target');
 export type TCardDropTargetData = {
   [cardDropTargetKey]: true;
-  card: Card;
+  card: CardWithPayload;
   columnId: string;
 };
 
@@ -79,7 +68,7 @@ export function getCardDropTargetData({
 const columnKey = Symbol('column');
 export type TColumnData = {
   [columnKey]: true;
-  column: TColumn;
+  column: ColumnWithPayload;
 };
 
 export function getColumnData({

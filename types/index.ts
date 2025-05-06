@@ -2,14 +2,12 @@ import { type SearchParams } from 'nuqs';
 import { type ReactNode } from 'react';
 import { Prisma } from '@/types';
 
-import { userIncludes } from '@/lib/rich-includes';
-import { getListsFromBoard } from '@/actions/lists';
+import { cardIncludes, userIncludes } from '@/lib/rich-includes';
+import { getColumnsFromBoard } from '@/actions/columns';
 
 export type { ReactNode, Component } from 'react';
 
 export * from '@/prisma/client';
-
-export * from './settings';
 
 export const blockBoardPanningAttr = 'data-block-board-panning' as const;
 
@@ -40,7 +38,13 @@ export enum HttpMethod {
   TRACE = 'TRACE',
 }
 
-export type ListWithPayload = Awaited<ReturnType<typeof getListsFromBoard>>[0];
+export type CardWithPayload = Prisma.CardGetPayload<{
+  include: typeof cardIncludes;
+}>;
+
+export type ColumnWithPayload = Awaited<
+  ReturnType<typeof getColumnsFromBoard>
+>[0];
 
 export type UserWithPayload = Prisma.UserGetPayload<{
   include: typeof userIncludes;

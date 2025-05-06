@@ -7,24 +7,29 @@ import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
 import { useContext, useEffect, useRef, useState } from 'react';
-import invariant from 'tiny-invariant';
-import { Column } from './column';
 import {
   isCardData,
   isCardDropTargetData,
   isColumnData,
   isDraggingACard,
   isDraggingAColumn,
-  TBoard,
-  TColumn,
 } from '@/lib/data';
-import { SettingsContext } from './settings-context';
 import { unsafeOverflowAutoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/unsafe-overflow/element';
-import { bindAll } from 'bind-event-listener';
-import { blockBoardPanningAttr } from '@/types';
 import { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
+import { blockBoardPanningAttr, type ColumnWithPayload } from '@/types';
+import { bindAll } from 'bind-event-listener';
+import invariant from 'tiny-invariant';
 
-export function Board({ initial }: { initial: TBoard }) {
+import { SettingsContext } from './settings-context';
+import { Column } from './column';
+
+type BoardProps = {
+  initial: {
+    columns: ColumnWithPayload[];
+  };
+};
+
+export const Board = ({ initial }: BoardProps) => {
   const [data, setData] = useState(initial);
 
   const scrollableRef = useRef<HTMLDivElement | null>(null);
@@ -41,6 +46,7 @@ export function Board({ initial }: { initial: TBoard }) {
         canMonitor: isDraggingACard,
         onDrop({ source, location }) {
           const dragging = source.data;
+
           if (!isCardData(dragging)) {
             return;
           }
@@ -50,11 +56,13 @@ export function Board({ initial }: { initial: TBoard }) {
           if (!innerMost) {
             return;
           }
+
           const dropTargetData = innerMost.data;
           const homeColumnIndex = data.columns.findIndex(
             (column) => column.id === dragging.columnId
           );
-          const home: TColumn | undefined = data.columns[homeColumnIndex];
+          const home: ColumnWithPayload | undefined =
+            data.columns[homeColumnIndex];
 
           if (!home) {
             return;
@@ -95,7 +103,7 @@ export function Board({ initial }: { initial: TBoard }) {
                 closestEdgeOfTarget: closestEdge,
               });
 
-              const updated: TColumn = {
+              const updated: ColumnWithPayload = {
                 ...home,
                 cards: reordered,
               };
@@ -120,11 +128,12 @@ export function Board({ initial }: { initial: TBoard }) {
             const finalIndex =
               closestEdge === 'bottom' ? indexOfTarget + 1 : indexOfTarget;
 
-            // remove card from home list
+            // remove card from home column
             const homeCards = Array.from(home.cards);
             homeCards.splice(cardIndexInHome, 1);
 
-            // insert into destination list
+            console.log('### dragging: ', dragging);
+            // insert into destination column
             const destinationCards = Array.from(destination.cards);
             destinationCards.splice(finalIndex, 0, dragging.card);
 
@@ -163,7 +172,7 @@ export function Board({ initial }: { initial: TBoard }) {
                 finishIndex: home.cards.length - 1,
               });
 
-              const updated: TColumn = {
+              const updated: ColumnWithPayload = {
                 ...home,
                 cards: reordered,
               };
@@ -175,12 +184,12 @@ export function Board({ initial }: { initial: TBoard }) {
 
             console.log('moving card to another column');
 
-            // remove card from home list
+            // remove card from home column
 
             const homeCards = Array.from(home.cards);
             homeCards.splice(cardIndexInHome, 1);
 
-            // insert into destination list
+            // insert into destination column
             const destinationCards = Array.from(destination.cards);
             destinationCards.splice(destination.cards.length, 0, dragging.card);
 
@@ -368,4 +377,4 @@ export function Board({ initial }: { initial: TBoard }) {
       </div>
     </div>
   );
-}
+};

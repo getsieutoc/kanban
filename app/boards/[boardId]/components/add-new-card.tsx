@@ -12,15 +12,11 @@ import { toast } from 'sonner';
 
 type AddCardButtonProps = {
   boardId: string;
-  listId: string;
+  columnId: string;
   totalCard: number;
 };
 
-export const AddNewCard = ({
-  boardId,
-  listId,
-  totalCard,
-}: AddCardButtonProps) => {
+export const AddNewCard = ({ boardId, columnId, totalCard }: AddCardButtonProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,7 +39,7 @@ export const AddNewCard = ({
         data: {
           title: title.trim(),
           order: totalCard,
-          list: { connect: { id: listId } },
+          column: { connect: { id: columnId } },
         },
       });
 

@@ -3,8 +3,8 @@
 import { prisma } from '@/lib/prisma-client';
 import { Prisma } from '@/types';
 
-import { createDefaultLists } from './lists';
- 
+import { createDefaultColumns } from './columns';
+
 export const getBoards = async (input?: Prisma.BoardFindManyArgs) => {
   return await prisma.board.findMany(input);
 };
@@ -23,16 +23,19 @@ export const getBoard = async (id: string) => {
   });
 };
 
+type CreateBoardOptions = {
+  createDefaultColumns?: boolean;
+};
 export const createBoard = async (
   input: Prisma.BoardCreateInput,
-  defaultLists?: boolean
+  options?: CreateBoardOptions
 ) => {
   const board = await prisma.board.create({
     data: input,
   });
 
-  if (defaultLists) {
-    await createDefaultLists(board.id);
+  if (options?.createDefaultColumns) {
+    await createDefaultColumns(board.id);
   }
 
   return board;
@@ -43,24 +46,24 @@ export const updateBoard = async (input: Prisma.BoardUpdateArgs) => {
 };
 
 export const deleteBoard = async (id: string) => {
-  // First delete all associated lists and cards to avoid constraint errors
-  const lists = await prisma.list.findMany({
+  // First delete all associated columns and cards to avoid constraint errors
+  const columns = await prisma.column.findMany({
     where: { boardId: id },
     select: { id: true },
   });
-  
-  const listIds = lists.map(list => list.id);
-  
-  // Delete all cards in those lists
+
+  const columnIds = columns.map((column) => column.id);
+
+  // Delete all cards in those columns
   await prisma.card.deleteMany({
-    where: { listId: { in: listIds } },
+    where: { columnId: { in: columnIds } },
   });
-  
-  // Delete all lists
-  await prisma.list.deleteMany({
+
+  // Delete all columns
+  await prisma.column.deleteMany({
     where: { boardId: id },
   });
-  
+
   // Delete the board itself
   return await prisma.board.delete({
     where: { id },

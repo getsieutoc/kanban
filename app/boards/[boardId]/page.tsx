@@ -1,31 +1,20 @@
+import { getColumnsFromBoard } from '@/actions/columns';
+import { Board } from '@/components/common/board';
 import { getBoard } from '@/actions/boards';
-import { getListsFromBoard } from '@/actions/lists';
 import { notFound } from 'next/navigation';
 import { PageProps } from '@/types';
 
-import { AddNewList } from './components/add-new-list';
-import { Board } from '@/components/common/board';
-import { TBoard, TCard, TColumn } from '@/lib/data';
-import { BoardContainer } from './components/board-container';
+import { AddNewColumn } from './components/add-new-column';
 
 export default async function BoardPage({
   params,
 }: PageProps<{ boardId: string }>) {
   const { boardId } = await params;
 
-  const [board, lists] = await Promise.all([
+  const [board, columns] = await Promise.all([
     getBoard(boardId),
-    getListsFromBoard(boardId),
+    getColumnsFromBoard(boardId),
   ]);
-
-  // console.log('board', board);
-  console.log('lists', lists);
-
-  function getInitialData(): TBoard {
-    return {
-      columns: lists,
-    };
-  }
 
   if (!board) {
     notFound();
@@ -33,12 +22,10 @@ export default async function BoardPage({
 
   return (
     <div className="flex h-full flex-col p-6">
-      {/* <BoardContainer lists={lists} boardId={boardId} title={board.title} /> */}
-
-      <Board initial={getInitialData()} />
+      <Board initial={{ columns: columns }} />
 
       <div className="flex h-full gap-3 overflow-x-auto pb-8">
-        <AddNewList boardId={boardId} totalList={lists.length} />
+        <AddNewColumn boardId={boardId} totalColumn={columns.length} />
       </div>
     </div>
   );

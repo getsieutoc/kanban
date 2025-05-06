@@ -1,6 +1,6 @@
 'use client';
 
-import { createList } from '@/actions/lists';
+import { createColumn } from '@/actions/columns';
 import { Plus } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,43 +24,38 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
 import { clearCache } from '@/lib/cache';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
-const listSchema = z.object({
+const columnSchema = z.object({
   title: z.string().default(''),
   order: z.number().default(0),
 });
 
-type FormInputs = z.infer<typeof listSchema>;
+type FormInputs = z.infer<typeof columnSchema>;
 
-type AddNewListProps = {
+type AddNewColumnProps = {
   boardId: string;
-  totalList: number;
+  totalColumn: number;
 };
 
-export const AddNewList = ({ boardId, totalList }: AddNewListProps) => {
+export const AddNewColumn = ({ boardId, totalColumn }: AddNewColumnProps) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
   const { user } = useAuth();
 
-  const defaultValues: FormInputs = useMemo(() => {
-    return {
-      title: '',
-      order: totalList,
-    };
-  }, []);
-
   const form = useForm<FormInputs>({
-    resolver: zodResolver(listSchema),
-    values: defaultValues,
+    resolver: zodResolver(columnSchema),
+    values: {
+      title: '',
+      order: totalColumn,
+    },
   });
 
   const {
@@ -84,22 +79,22 @@ export const AddNewList = ({ boardId, totalList }: AddNewListProps) => {
     setLoading(true);
 
     try {
-      const newBoard = await createList({
+      const newColumn = await createColumn({
         data: {
           ...input,
-          order: totalList,
+          order: totalColumn,
           board: { connect: { id: boardId } },
         },
       });
 
-      if (newBoard) {
-        console.log('New list created', newBoard);
-        toast.success('List created successfully');
+      if (newColumn) {
+        console.log('New column created', newColumn);
+        toast.success('Column created successfully');
         setOpen(false);
         clearCache(`/boards/${boardId}`);
       }
-    } catch (_err) {
-      toast.error('Failed to create board');
+    } catch {
+      toast.error('Failed to create column');
     } finally {
       setLoading(false);
     }
@@ -111,7 +106,7 @@ export const AddNewList = ({ boardId, totalList }: AddNewListProps) => {
         <Card className="flex w-64 shrink-0 cursor-pointer items-center justify-center p-2">
           <div className="text-muted-foreground flex items-center gap-1 text-sm">
             <Plus className="h-4 w-4" />
-            <span>Add another list</span>
+            <span>Add another column</span>
           </div>
         </Card>
       </DialogTrigger>
@@ -122,7 +117,7 @@ export const AddNewList = ({ boardId, totalList }: AddNewListProps) => {
             className="flex flex-col gap-4"
           >
             <DialogHeader>
-              <DialogTitle>Add New List</DialogTitle>
+              <DialogTitle>Add New Column</DialogTitle>
               <DialogDescription>Fill in details</DialogDescription>
             </DialogHeader>
 
