@@ -23,13 +23,13 @@ import {
   isDraggingAColumn,
   TCardData,
 } from '@/lib/data';
-import { isShallowEqual } from '@/lib/is-shallow-equal';
+import { SettingsContext } from '@/components/common/settings-context';
 import { blockBoardPanningAttr, type ColumnWithPayload } from '@/types';
+import { isShallowEqual } from '@/lib/is-shallow-equal';
 import { isSafari } from '@/lib/is-safari';
 
-import { SettingsContext } from './settings-context';
 import { CardItem, CardShadow } from './card';
-import { AddNewCard } from '@/app/boards/[boardId]/components/add-new-card';
+import { AddNewCard } from './add-new-card';
 
 type ColumnState =
   | {

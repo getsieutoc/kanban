@@ -20,7 +20,7 @@ import { blockBoardPanningAttr, type ColumnWithPayload } from '@/types';
 import { bindAll } from 'bind-event-listener';
 import invariant from 'tiny-invariant';
 
-import { SettingsContext } from './settings-context';
+import { SettingsContext } from '@/components/common/settings-context';
 import { Column } from './column';
 
 type BoardProps = {
@@ -30,6 +30,21 @@ type BoardProps = {
 };
 
 export const Board = ({ initial }: BoardProps) => {
+  const handleCardCreate = (columnId: string, card: CardWithPayload) => {
+    setData((prevData) => {
+      const columns = [...prevData.columns];
+      const columnIndex = columns.findIndex((col) => col.id === columnId);
+
+      if (columnIndex !== -1) {
+        const column = { ...columns[columnIndex] };
+        column.cards = [...column.cards, card];
+        columns[columnIndex] = column;
+      }
+
+      return { ...prevData, columns };
+    });
+  };
+
   const [data, setData] = useState(initial);
 
   const scrollableRef = useRef<HTMLDivElement | null>(null);
@@ -372,7 +387,12 @@ export const Board = ({ initial }: BoardProps) => {
         ref={scrollableRef}
       >
         {data.columns.map((column) => (
-          <Column key={column.id} column={column} />
+          <Column
+            key={column.id}
+            column={column}
+            boardId={column.boardId}
+            onCardCreate={handleCardCreate}
+          />
         ))}
       </div>
     </div>

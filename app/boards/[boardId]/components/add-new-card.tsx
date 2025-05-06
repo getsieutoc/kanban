@@ -8,13 +8,15 @@ import { createCard } from '@/actions/cards';
 import { useAuth } from '@/hooks/use-auth';
 import { clearCache } from '@/lib/cache';
 import { toast } from 'sonner';
+import { CardWithPayload } from '@/types';
 
 type AddCardButtonProps = {
   boardId: string;
   columnId: string;
+  onCardCreate?: (columnId: string, card: CardWithPayload) => void;
 };
 
-export const AddNewCard = ({ boardId, columnId }: AddCardButtonProps) => {
+export const AddNewCard = ({ boardId, columnId, onCardCreate }: AddCardButtonProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,6 +43,11 @@ export const AddNewCard = ({ boardId, columnId }: AddCardButtonProps) => {
       });
 
       if (newCard) {
+        // Update client-side state
+        if (onCardCreate) {
+          onCardCreate(columnId, newCard);
+        }
+        
         toast.success('Card created successfully');
         setTitle('');
         setIsEditing(false);

@@ -1,10 +1,10 @@
 import { getColumnsFromBoard } from '@/actions/columns';
-import { Board } from '@/components/common/board';
 import { getBoard } from '@/actions/boards';
 import { notFound } from 'next/navigation';
 import { PageProps } from '@/types';
 
 import { AddNewColumn } from './components/add-new-column';
+import { Board } from './components/board';
 
 export default async function BoardPage({
   params,
