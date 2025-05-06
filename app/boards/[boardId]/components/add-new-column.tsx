@@ -88,7 +88,6 @@ export const AddNewColumn = ({ boardId, totalColumn }: AddNewColumnProps) => {
       });
 
       if (newColumn) {
-        console.log('New column created', newColumn);
         toast.success('Column created successfully');
         setOpen(false);
         clearCache(`/boards/${boardId}`);

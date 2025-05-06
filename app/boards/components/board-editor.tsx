@@ -107,13 +107,11 @@ export const AddNewBoard = ({ trigger }: AddNewBoardProps) => {
       );
 
       if (newBoard) {
-        console.log('New board created', newBoard);
         toast.success('Board created successfully');
         setOpen(false);
         clearCache('/boards');
       }
-    } catch (_err) {
-      console.log('### _err: ', _err);
+    } catch {
       toast.error('Failed to create board');
     } finally {
       setLoading(false);

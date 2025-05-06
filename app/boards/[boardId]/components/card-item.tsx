@@ -20,11 +20,10 @@ type CardItemProps = {
   id: string;
   columnId: string;
   boardId: string;
-  index: number;
   card: Card;
 };
 
-export function CardItem({ id, boardId, index, card }: CardItemProps) {
+export function CardItem({ id, boardId, card }: CardItemProps) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 

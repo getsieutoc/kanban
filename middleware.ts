@@ -4,12 +4,12 @@ import { getSessionCookie } from 'better-auth/cookies';
 export async function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
   const { pathname } = request.nextUrl;
-  
-  console.log('=== Auth Debug ===');
-  console.log('Path:', pathname);
-  console.log('Session Cookie Present:', !!sessionCookie);
-  console.log('Current URL:', request.url);
-  
+
+  // console.info('=== Auth Debug ===');
+  // console.info('Path:', pathname);
+  // console.info('Session Cookie Present:', !!sessionCookie);
+  // console.info('Current URL:', request.url);
+
   // Handle root path
   if (pathname === '/') {
     if (sessionCookie) {
@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
     if (sessionCookie) {
       return NextResponse.redirect(new URL('/boards', request.url));
     }
-    
+
     return NextResponse.next();
   }
 

@@ -13,7 +13,6 @@ import { cn, formatBytes, isFileWithPreview } from '@/lib/utils';
 import { useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { toast } from 'sonner';
-import { useFormField } from '../ui/form';
 
 interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
   value?: File[];
@@ -71,12 +70,6 @@ export function FileUploader(props: FileUploaderProps) {
           preview: URL.createObjectURL(file),
         })
       );
-
-      console.log('Received files:', {
-        acceptedFiles,
-        newFiles,
-        rejectedFiles,
-      });
 
       const updatedFiles = files ? [...files, ...newFiles] : newFiles;
 

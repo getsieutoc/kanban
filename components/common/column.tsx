@@ -5,7 +5,7 @@ import {
   dropTargetForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { memo, useContext, useEffect, useRef, useState } from 'react';
-import { Ellipsis, Plus } from '@/components/icons';
+import { Ellipsis } from '@/components/icons';
 import invariant from 'tiny-invariant';
 
 import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
@@ -25,11 +25,11 @@ import {
 } from '@/lib/data';
 import { isShallowEqual } from '@/lib/is-shallow-equal';
 import { blockBoardPanningAttr, type ColumnWithPayload } from '@/types';
-import { Button } from '@/components/ui/button';
 import { isSafari } from '@/lib/is-safari';
 
 import { SettingsContext } from './settings-context';
 import { CardItem, CardShadow } from './card';
+import { AddNewCard } from '@/app/boards/[boardId]/components/add-new-card';
 
 type ColumnState =
   | {
@@ -71,7 +71,13 @@ const CardColumn = memo(function CardColumn({
   ));
 });
 
-export function Column({ column }: { column: ColumnWithPayload }) {
+export function Column({
+  boardId,
+  column,
+}: {
+  boardId: string;
+  column: ColumnWithPayload;
+}) {
   const scrollableRef = useRef<HTMLDivElement | null>(null);
 
   const outerFullHeightRef = useRef<HTMLDivElement | null>(null);
@@ -285,10 +291,7 @@ export function Column({ column }: { column: ColumnWithPayload }) {
             ) : null}
           </div>
           <div className="flex flex-row gap-2 p-3">
-            <Button variant="ghost" className="flex flex-grow flex-row">
-              <Plus size={16} />
-              <div className="leading-4">Add a card</div>
-            </Button>
+            <AddNewCard boardId={boardId} columnId={column.id} />
           </div>
         </div>
       </div>

@@ -133,7 +133,7 @@ model Column {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   title     String
-  order     Int
+  order     Int?     @default(autoincrement())
   board     Board    @relation(fields: [boardId], references: [id])
   boardId   String
   cards     Card[]
@@ -150,7 +150,7 @@ model Card {
   dueDate     DateTime?
   column      Column      @relation(fields: [columnId], references: [id])
   columnId    String
-  order       Int
+  order       Int?        @default(autoincrement())
   assignees   User[]
   labels      CardLabel[]
   reactions   Reaction[]

@@ -22,7 +22,7 @@ export default async function BoardPage({
 
   return (
     <div className="flex h-full flex-col p-6">
-      <Board initial={{ columns: columns }} />
+      <Board initial={{ columns }} />
 
       <div className="flex h-full gap-3 overflow-x-auto pb-8">
         <AddNewColumn boardId={boardId} totalColumn={columns.length} />

@@ -132,7 +132,7 @@ export const Board = ({ initial }: BoardProps) => {
             const homeCards = Array.from(home.cards);
             homeCards.splice(cardIndexInHome, 1);
 
-            console.log('### dragging: ', dragging);
+            console.info('### dragging: ', dragging);
             // insert into destination column
             const destinationCards = Array.from(destination.cards);
             destinationCards.splice(finalIndex, 0, dragging.card);
@@ -163,7 +163,7 @@ export const Board = ({ initial }: BoardProps) => {
 
             // dropping on home
             if (home === destination) {
-              console.log('moving card to home column');
+              console.info('moving card to home column');
 
               // move to last position
               const reordered = reorder({
@@ -182,7 +182,7 @@ export const Board = ({ initial }: BoardProps) => {
               return;
             }
 
-            console.log('moving card to another column');
+            console.info('moving card to another column');
 
             // remove card from home column
 

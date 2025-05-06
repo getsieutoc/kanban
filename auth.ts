@@ -40,7 +40,7 @@ export const auth = betterAuth({
   hooks: {
     after: createAuthMiddleware(async (ctx) => {
       // DEBUG:
-      // console.log({ path: ctx.path, newSession: ctx.context.newSession });
+      // console.info({ path: ctx.path, newSession: ctx.context.newSession });
       // Only execute this at early stage of registration
       if (isAuthPath(ctx.path) && ctx.context.newSession) {
         const { user } = ctx.context.newSession;

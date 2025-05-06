@@ -1,22 +1,20 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import { Plus, X } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { createCard } from '@/actions/cards';
 import { useAuth } from '@/hooks/use-auth';
-import { useState, useRef, useEffect } from 'react';
 import { clearCache } from '@/lib/cache';
 import { toast } from 'sonner';
 
 type AddCardButtonProps = {
   boardId: string;
   columnId: string;
-  totalCard: number;
 };
 
-export const AddNewCard = ({ boardId, columnId, totalCard }: AddCardButtonProps) => {
+export const AddNewCard = ({ boardId, columnId }: AddCardButtonProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,7 +36,6 @@ export const AddNewCard = ({ boardId, columnId, totalCard }: AddCardButtonProps)
       const newCard = await createCard({
         data: {
           title: title.trim(),
-          order: totalCard,
           column: { connect: { id: columnId } },
         },
       });
@@ -101,14 +98,13 @@ export const AddNewCard = ({ boardId, columnId, totalCard }: AddCardButtonProps)
   }
 
   return (
-    <Card
+    <Button
+      className="flex w-full"
       onClick={() => setIsEditing(true)}
-      className="flex h-full w-full shrink-0 cursor-pointer items-center justify-center p-2"
+      variant="outline"
     >
-      <div className="text-muted-foreground flex items-center gap-1 text-sm">
-        <Plus className="h-4 w-4" />
-        <span>Add new card</span>
-      </div>
-    </Card>
+      <Plus className="h-4 w-4" />
+      <span>Add new card</span>
+    </Button>
   );
 };
