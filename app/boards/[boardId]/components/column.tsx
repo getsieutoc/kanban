@@ -24,7 +24,7 @@ import { memo, useContext, useEffect, useRef, useState } from 'react';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { isShallowEqual } from '@/lib/is-shallow-equal';
 import { Ellipsis } from '@/components/icons';
-import { reorderCard } from '@/actions/cards';
+import { clientQueue } from '@/lib/client-queue';
 import { isSafari } from '@/lib/is-safari';
 import { clearCache } from '@/lib/cache';
 import invariant from 'tiny-invariant';
@@ -164,13 +164,15 @@ export function Column({ column }: { column: ColumnWithPayload }) {
           //     column.cards.length > 0
           //       ? column.cards[column.cards.length - 1].order
           //       : 0;
-
-          //   reorderCard({
-          //     id: source.data.card.id,
+          //
+          //   const newOrder = lastCardOrder + 1;
+          //
+          //   // Queue the database update
+          //   clientQueue.addCardUpdate({
+          //     cardId: source.data.card.id,
           //     columnId: column.id,
-          //     order: lastCardOrder + 1,
-          //   }).then(() => {
-          //     clearCache(`/boards/${column.boardId}`);
+          //     order: newOrder,
+          //     boardId: column.boardId
           //   });
           // }
           setState(idle);

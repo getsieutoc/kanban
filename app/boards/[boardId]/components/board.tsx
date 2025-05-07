@@ -15,10 +15,10 @@ import { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { blockBoardPanningAttr, type ColumnWithPayload } from '@/types';
 import { SettingsContext } from '@/components/common/settings-context';
-import { useControllableState } from '@/hooks/use-controllable-state';
 import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { useContext, useEffect, useRef, useState } from 'react';
+import { clientQueue } from '@/lib/client-queue';
 import { bindAll } from 'bind-event-listener';
 import invariant from 'tiny-invariant';
 
@@ -41,75 +41,6 @@ export const Board = ({ initial }: BoardProps) => {
   const scrollableRef = useRef<HTMLDivElement | null>(null);
 
   const { settings } = useContext(SettingsContext);
-
-  // // Handle optimistic updates for card reordering
-  // useEffect(() => {
-  //   const handleCardReorder = (
-  //     event: CustomEvent<{
-  //       cardId: string;
-  //       sourceColumnId: string;
-  //       targetColumnId: string;
-  //       newOrder: number;
-  //     }>
-  //   ) => {
-  //     setData((currentData) => {
-  //       const columns = Array.from(currentData.columns);
-
-  //       // Find source and target columns
-  //       const sourceColumnIndex = columns.findIndex(
-  //         (col) => col.id === event.detail.sourceColumnId
-  //       );
-  //       const targetColumnIndex = columns.findIndex(
-  //         (col) => col.id === event.detail.targetColumnId
-  //       );
-
-  //       if (sourceColumnIndex === -1 || targetColumnIndex === -1)
-  //         return currentData;
-
-  //       // Remove card from source column
-  //       const sourceColumn = columns[sourceColumnIndex];
-  //       const [movedCard] = sourceColumn.cards.splice(
-  //         sourceColumn.cards.findIndex(
-  //           (card) => card.id === event.detail.cardId
-  //         ),
-  //         1
-  //       );
-
-  //       if (!movedCard) return currentData;
-
-  //       // Add card to target column at the correct position
-  //       const targetColumn = columns[targetColumnIndex];
-  //       const targetCards = Array.from(targetColumn.cards);
-
-  //       // Insert at the correct position based on newOrder
-  //       const insertIndex = targetCards.findIndex(
-  //         (card) => card.order > event.detail.newOrder
-  //       );
-  //       const finalIndex =
-  //         insertIndex === -1 ? targetCards.length : insertIndex;
-  //       targetCards.splice(finalIndex, 0, {
-  //         ...movedCard,
-  //         order: event.detail.newOrder,
-  //       });
-
-  //       // Update columns
-  //       columns[sourceColumnIndex] = {
-  //         ...sourceColumn,
-  //         cards: sourceColumn.cards,
-  //       };
-  //       columns[targetColumnIndex] = { ...targetColumn, cards: targetCards };
-
-  //       return { ...currentData, columns };
-  //     });
-  //   };
-
-  //   window.addEventListener('card-reorder', handleCardReorder as EventListener);
-  //   return () =>
-  //     window.removeEventListener(
-  //       'card-reorder',
-  //       handleCardReorder as EventListener
-  //     );
-  // }, [setData]);
 
   useEffect(() => {
     const element = scrollableRef.current;
@@ -183,23 +114,37 @@ export const Board = ({ initial }: BoardProps) => {
               };
               const columns = Array.from(data.columns);
               columns[homeColumnIndex] = updated;
+
               setData({ ...data, columns });
+
+              reordered.forEach((card, index) => {
+                if (card.order !== index) {
+                  clientQueue.addCardUpdate({
+                    columnId: card.columnId,
+                    cardId: card.id,
+                    order: index,
+                  });
+                }
+              });
+
               return;
             }
 
             // moving card from one column to another
+            console.info('moving card from one column to another');
+
             // unable to find destination
             if (!destination) {
               return;
             }
 
-            const indexOfTarget = destination.cards.findIndex(
+            const targetIndex = destination.cards.findIndex(
               (card) => card.id === dropTargetData.card.id
             );
 
             const closestEdge = extractClosestEdge(dropTargetData);
             const finalIndex =
-              closestEdge === 'bottom' ? indexOfTarget + 1 : indexOfTarget;
+              closestEdge === 'bottom' ? targetIndex + 1 : targetIndex;
 
             // remove card from home column
             const homeCards = Array.from(home.cards);
@@ -220,6 +165,26 @@ export const Board = ({ initial }: BoardProps) => {
             };
 
             setData({ ...data, columns });
+
+            homeCards.forEach((card, index) => {
+              if (card.order !== index) {
+                clientQueue.addCardUpdate({
+                  columnId: columns[homeColumnIndex].id,
+                  cardId: card.id,
+                  order: index,
+                });
+              }
+            });
+
+            destinationCards.forEach((card, index) => {
+              if (card.order !== index) {
+                clientQueue.addCardUpdate({
+                  columnId: columns[destinationColumnIndex].id,
+                  cardId: card.id,
+                  order: index,
+                });
+              }
+            });
 
             return;
           }
@@ -256,6 +221,16 @@ export const Board = ({ initial }: BoardProps) => {
 
               setData({ ...data, columns });
 
+              reordered.forEach((card, index) => {
+                if (card.order !== index) {
+                  clientQueue.addCardUpdate({
+                    columnId: columns[homeColumnIndex].id,
+                    cardId: card.id,
+                    order: index,
+                  });
+                }
+              });
+
               return;
             }
 
@@ -281,6 +256,26 @@ export const Board = ({ initial }: BoardProps) => {
             };
 
             setData({ ...data, columns });
+
+            homeCards.forEach((card, index) => {
+              if (card.order !== index) {
+                clientQueue.addCardUpdate({
+                  columnId: columns[homeColumnIndex].id,
+                  cardId: card.id,
+                  order: index,
+                });
+              }
+            });
+
+            destinationCards.forEach((card, index) => {
+              if (card.order !== index) {
+                clientQueue.addCardUpdate({
+                  columnId: columns[destinationColumnIndex].id,
+                  cardId: card.id,
+                  order: index,
+                });
+              }
+            });
 
             return;
           }
@@ -325,7 +320,19 @@ export const Board = ({ initial }: BoardProps) => {
             startIndex: homeIndex,
             finishIndex: destinationIndex,
           });
+          // Update UI state
           setData({ ...data, columns: reordered });
+
+          // Queue updates for all affected columns
+          reordered.forEach((column, index) => {
+            if (column.order !== index) {
+              clientQueue.addColumnUpdate({
+                boardId: column.boardId,
+                columnId: column.id,
+                order: index,
+              });
+            }
+          });
         },
       }),
       autoScrollForElements({

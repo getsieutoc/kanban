@@ -41,6 +41,19 @@ export const updateColumn = async (input: Prisma.ColumnUpdateArgs) => {
   return await prisma.column.update(input);
 };
 
+export const reorderColumn = async ({
+  id,
+  order,
+}: {
+  id: string;
+  order: number;
+}) => {
+  return await prisma.column.update({
+    where: { id },
+    data: { order },
+  });
+};
+
 export const deleteColumn = async (id: string) => {
   // First delete all cards in this column
   await prisma.card.deleteMany({

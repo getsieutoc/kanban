@@ -26,7 +26,8 @@ import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/elemen
 import { type RefObject, useEffect, useRef, useState } from 'react';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { AlertModal } from '@/components/common/alert-modal';
-import { deleteCard, reorderCard } from '@/actions/cards';
+import { deleteCard } from '@/actions/cards';
+import { clientQueue } from '@/lib/client-queue';
 import { isShallowEqual } from '@/lib/is-shallow-equal';
 import { Column, type CardWithPayload } from '@/types';
 import { MoreHorizontal } from '@/components/icons';
@@ -110,6 +111,7 @@ const CardDisplay = ({
       clearCache(`/boards/${boardId}`);
     }
   };
+
   return (
     <>
       <div
@@ -120,6 +122,7 @@ const CardDisplay = ({
         {state.type === 'is-over' && state.closestEdge === 'top' ? (
           <CardShadow dragging={state.dragging} />
         ) : null}
+
         <div
           ref={innerRef}
           className={`flex items-center justify-between rounded bg-slate-700 p-2 text-slate-300 ${innerStyles[state.type]}`}
@@ -284,35 +287,17 @@ export const CardItem = ({
           setState(idle);
         },
         onDrop({ source, self }) {
-          console.log('onDrop', { source, self });
-
           // if (isCardData(source.data) && source.data.columnId !== column.id) {
           //   const newOrder =
           //     (card.order ?? 0) +
           //     (extractClosestEdge(self.data) === 'bottom' ? 1 : 0);
-
-          //   // Optimistically update the UI through Board's state
-          //   const event = new CustomEvent('card-reorder', {
-          //     detail: {
-          //       cardId: source.data.card.id,
-          //       sourceColumnId: source.data.columnId,
-          //       targetColumnId: column.id,
-          //       newOrder,
-          //     },
-          //   });
-          //   window.dispatchEvent(event);
-
-          //   console.log({ newOrder });
-
-          //   // Update server state
-          //   reorderCard({
-          //     id: source.data.card.id,
+          //
+          //   // Queue the database update
+          //   clientQueue.addCardUpdate({
+          //     cardId: source.data.card.id,
           //     columnId: column.id,
           //     order: newOrder,
-          //   }).catch((error) => {
-          //     console.error('Failed to reorder card:', error);
-          //     // Revert optimistic update on error
-          //     clearCache(`/boards/${column.boardId}`);
+          //     boardId: column.boardId,
           //   });
           // }
           setState(idle);
