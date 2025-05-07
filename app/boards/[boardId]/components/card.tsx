@@ -1,41 +1,40 @@
 'use client';
 
 import {
-  draggable,
-  dropTargetForElements,
-} from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source';
-import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
-import { type RefObject, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import invariant from 'tiny-invariant';
-import { isSafari } from '@/lib/is-safari';
-import {
-  type Edge,
-  attachClosestEdge,
-  extractClosestEdge,
-} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
-import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import {
   getCardData,
   getCardDropTargetData,
   isCardData,
   isDraggingACard,
 } from '@/lib/data';
+import {
+  type Edge,
+  attachClosestEdge,
+  extractClosestEdge,
+} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
+import {
+  draggable,
+  dropTargetForElements,
+} from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
+import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source';
+import { type RefObject, useEffect, useRef, useState } from 'react';
+import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
+import { AlertModal } from '@/components/common/alert-modal';
+import { deleteCard, reorderCard } from '@/actions/cards';
 import { isShallowEqual } from '@/lib/is-shallow-equal';
 import { Column, type CardWithPayload } from '@/types';
-import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from '@/components/icons';
-import { deleteCard } from '@/actions/cards';
-// import { clearCache } from '@/lib/cache';
-import { AlertModal } from '@/components/common/alert-modal';
+import { Button } from '@/components/ui/button';
+import { isSafari } from '@/lib/is-safari';
 import { clearCache } from '@/lib/cache';
+import { createPortal } from 'react-dom';
+import invariant from 'tiny-invariant';
 
 type TCardState =
   | {
@@ -284,7 +283,38 @@ export const CardItem = ({
           }
           setState(idle);
         },
-        onDrop() {
+        onDrop({ source, self }) {
+          console.log('onDrop', { source, self });
+
+          // if (isCardData(source.data) && source.data.columnId !== column.id) {
+          //   const newOrder =
+          //     (card.order ?? 0) +
+          //     (extractClosestEdge(self.data) === 'bottom' ? 1 : 0);
+
+          //   // Optimistically update the UI through Board's state
+          //   const event = new CustomEvent('card-reorder', {
+          //     detail: {
+          //       cardId: source.data.card.id,
+          //       sourceColumnId: source.data.columnId,
+          //       targetColumnId: column.id,
+          //       newOrder,
+          //     },
+          //   });
+          //   window.dispatchEvent(event);
+
+          //   console.log({ newOrder });
+
+          //   // Update server state
+          //   reorderCard({
+          //     id: source.data.card.id,
+          //     columnId: column.id,
+          //     order: newOrder,
+          //   }).catch((error) => {
+          //     console.error('Failed to reorder card:', error);
+          //     // Revert optimistic update on error
+          //     clearCache(`/boards/${column.boardId}`);
+          //   });
+          // }
           setState(idle);
         },
       })

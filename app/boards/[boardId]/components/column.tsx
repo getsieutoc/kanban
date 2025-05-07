@@ -1,20 +1,6 @@
 'use client';
 
 import {
-  draggable,
-  dropTargetForElements,
-} from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-import { memo, useContext, useEffect, useRef, useState } from 'react';
-import { Ellipsis } from '@/components/icons';
-import invariant from 'tiny-invariant';
-
-import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
-import { unsafeOverflowAutoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/unsafe-overflow/element';
-import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
-import { DragLocationHistory } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
-import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source';
-import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
-import {
   getColumnData,
   isCardData,
   isCardDropTargetData,
@@ -23,10 +9,25 @@ import {
   isDraggingAColumn,
   TCardData,
 } from '@/lib/data';
-import { SettingsContext } from '@/components/common/settings-context';
+import {
+  draggable,
+  dropTargetForElements,
+} from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import { unsafeOverflowAutoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/unsafe-overflow/element';
+import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
+import { preserveOffsetOnSource } from '@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source';
+import { DragLocationHistory } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
+import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
 import { blockBoardPanningAttr, type ColumnWithPayload } from '@/types';
+import { SettingsContext } from '@/components/common/settings-context';
+import { memo, useContext, useEffect, useRef, useState } from 'react';
+import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { isShallowEqual } from '@/lib/is-shallow-equal';
+import { Ellipsis } from '@/components/icons';
+import { reorderCard } from '@/actions/cards';
 import { isSafari } from '@/lib/is-safari';
+import { clearCache } from '@/lib/cache';
+import invariant from 'tiny-invariant';
 
 import { CardItem, CardShadow } from './card';
 import { AddNewCard } from './add-new-card';
@@ -156,7 +157,22 @@ export function Column({ column }: { column: ColumnWithPayload }) {
         onDragStart() {
           setState({ type: 'is-dragging' });
         },
-        onDrop() {
+        onDrop({ source }) {
+          // if (isCardData(source.data) && source.data.columnId !== column.id) {
+          //   // When dropping directly on a column, add to the end
+          //   const lastCardOrder =
+          //     column.cards.length > 0
+          //       ? column.cards[column.cards.length - 1].order
+          //       : 0;
+
+          //   reorderCard({
+          //     id: source.data.card.id,
+          //     columnId: column.id,
+          //     order: lastCardOrder + 1,
+          //   }).then(() => {
+          //     clearCache(`/boards/${column.boardId}`);
+          //   });
+          // }
           setState(idle);
         },
       }),
@@ -199,7 +215,22 @@ export function Column({ column }: { column: ColumnWithPayload }) {
           }
           setState(idle);
         },
-        onDrop() {
+        onDrop({ source }) {
+          // if (isCardData(source.data) && source.data.columnId !== column.id) {
+          //   // When dropping directly on a column, add to the end
+          //   const lastCardOrder =
+          //     column.cards.length > 0
+          //       ? column.cards[column.cards.length - 1].order
+          //       : 0;
+
+          //   reorderCard({
+          //     id: source.data.card.id,
+          //     columnId: column.id,
+          //     order: lastCardOrder + 1,
+          //   }).then(() => {
+          //     clearCache(`/boards/${column.boardId}`);
+          //   });
+          // }
           setState(idle);
         },
       }),

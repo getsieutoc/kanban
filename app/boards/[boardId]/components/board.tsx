@@ -1,14 +1,5 @@
 'use client';
 
-import { unsafeOverflowAutoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/unsafe-overflow/element';
-import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
-import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
-import { reorderWithEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/reorder-with-edge';
-import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
-import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
-import { useControllableState } from '@/hooks/use-controllable-state';
-import { useContext, useEffect, useRef } from 'react';
 import {
   isCardData,
   isCardDropTargetData,
@@ -16,16 +7,21 @@ import {
   isDraggingACard,
   isDraggingAColumn,
 } from '@/lib/data';
-import {
-  blockBoardPanningAttr,
-  // type CardWithPayload,
-  type ColumnWithPayload,
-} from '@/types';
+import { unsafeOverflowAutoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/unsafe-overflow/element';
+import { reorderWithEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/reorder-with-edge';
+import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
+import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 import { CleanupFn } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
+import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import { blockBoardPanningAttr, type ColumnWithPayload } from '@/types';
+import { SettingsContext } from '@/components/common/settings-context';
+import { useControllableState } from '@/hooks/use-controllable-state';
+import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
+import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { bindAll } from 'bind-event-listener';
 import invariant from 'tiny-invariant';
 
-import { SettingsContext } from '@/components/common/settings-context';
 import { Column } from './column';
 
 type BoardProps = {
@@ -35,18 +31,88 @@ type BoardProps = {
 };
 
 export const Board = ({ initial }: BoardProps) => {
-  const [data, setData] = useControllableState({
-    prop: initial,
-    defaultProp: { columns: [] },
-  });
+  // const [data, setData] = useControllableState({
+  //   prop: initial,
+  //   defaultProp: { columns: [] },
+  // });
+
+  const [data, setData] = useState(initial);
 
   const scrollableRef = useRef<HTMLDivElement | null>(null);
 
   const { settings } = useContext(SettingsContext);
 
+  // // Handle optimistic updates for card reordering
+  // useEffect(() => {
+  //   const handleCardReorder = (
+  //     event: CustomEvent<{
+  //       cardId: string;
+  //       sourceColumnId: string;
+  //       targetColumnId: string;
+  //       newOrder: number;
+  //     }>
+  //   ) => {
+  //     setData((currentData) => {
+  //       const columns = Array.from(currentData.columns);
+
+  //       // Find source and target columns
+  //       const sourceColumnIndex = columns.findIndex(
+  //         (col) => col.id === event.detail.sourceColumnId
+  //       );
+  //       const targetColumnIndex = columns.findIndex(
+  //         (col) => col.id === event.detail.targetColumnId
+  //       );
+
+  //       if (sourceColumnIndex === -1 || targetColumnIndex === -1)
+  //         return currentData;
+
+  //       // Remove card from source column
+  //       const sourceColumn = columns[sourceColumnIndex];
+  //       const [movedCard] = sourceColumn.cards.splice(
+  //         sourceColumn.cards.findIndex(
+  //           (card) => card.id === event.detail.cardId
+  //         ),
+  //         1
+  //       );
+
+  //       if (!movedCard) return currentData;
+
+  //       // Add card to target column at the correct position
+  //       const targetColumn = columns[targetColumnIndex];
+  //       const targetCards = Array.from(targetColumn.cards);
+
+  //       // Insert at the correct position based on newOrder
+  //       const insertIndex = targetCards.findIndex(
+  //         (card) => card.order > event.detail.newOrder
+  //       );
+  //       const finalIndex =
+  //         insertIndex === -1 ? targetCards.length : insertIndex;
+  //       targetCards.splice(finalIndex, 0, {
+  //         ...movedCard,
+  //         order: event.detail.newOrder,
+  //       });
+
+  //       // Update columns
+  //       columns[sourceColumnIndex] = {
+  //         ...sourceColumn,
+  //         cards: sourceColumn.cards,
+  //       };
+  //       columns[targetColumnIndex] = { ...targetColumn, cards: targetCards };
+
+  //       return { ...currentData, columns };
+  //     });
+  //   };
+
+  //   window.addEventListener('card-reorder', handleCardReorder as EventListener);
+  //   return () =>
+  //     window.removeEventListener(
+  //       'card-reorder',
+  //       handleCardReorder as EventListener
+  //     );
+  // }, [setData]);
+
   useEffect(() => {
     const element = scrollableRef.current;
-
     invariant(element);
 
     return combine(
@@ -122,7 +188,6 @@ export const Board = ({ initial }: BoardProps) => {
             }
 
             // moving card from one column to another
-
             // unable to find destination
             if (!destination) {
               return;
@@ -140,7 +205,6 @@ export const Board = ({ initial }: BoardProps) => {
             const homeCards = Array.from(home.cards);
             homeCards.splice(cardIndexInHome, 1);
 
-            console.info('### dragging: ', dragging);
             // insert into destination column
             const destinationCards = Array.from(destination.cards);
             destinationCards.splice(finalIndex, 0, dragging.card);
@@ -154,7 +218,9 @@ export const Board = ({ initial }: BoardProps) => {
               ...destination,
               cards: destinationCards,
             };
+
             setData({ ...data, columns });
+
             return;
           }
 
@@ -184,9 +250,12 @@ export const Board = ({ initial }: BoardProps) => {
                 ...home,
                 cards: reordered,
               };
+
               const columns = Array.from(data.columns);
               columns[homeColumnIndex] = updated;
+
               setData({ ...data, columns });
+
               return;
             }
 
@@ -210,7 +279,9 @@ export const Board = ({ initial }: BoardProps) => {
               ...destination,
               cards: destinationCards,
             };
+
             setData({ ...data, columns });
+
             return;
           }
         },
